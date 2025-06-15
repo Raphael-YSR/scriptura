@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scriptura</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .container { /* Added a container for overall layout */
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            margin-bottom: 1rem;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button:active {
+            background-color: #1e7e34;
+        }
+        /* Style for the shutdown button */
+        #shutdownServerBtn {
+            background-color: #dc3545; /* Red color */
+            margin-top: 20px;
+        }
+        #shutdownServerBtn:hover {
+            background-color: #c82333;
+        }
+
+        /* Custom Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .modal-buttons button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .modal-buttons .confirm-btn {
+            background-color: #dc3545; /* Red for confirm */
+            color: white;
+        }
+        .modal-buttons .confirm-btn:hover {
+            background-color: #c82333;
+        }
+        .modal-buttons .cancel-btn {
+            background-color: #6c757d; /* Gray for cancel */
+            color: white;
+        }
+        .modal-buttons .cancel-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scriptura</h1>
+        <p>Explore the Word of God</p>
+
+        <div>
+            <input type="text" id="searchInput" placeholder="e.g., John 3, Gen 1, Ps 23">
+        </div>
+
+        <div>
+            <p>Continue where you left off:</p>
+            <!-- Combined lastReadLink and lastReadContent into a single link -->
+            <a id="lastReadLink" href="#">
+                No recent chapter. Start exploring!
+            </a>
+        </div>
+
+        <div>
+            <button id="oldTestamentBtn">
+                Old Testament
+            </button>
+            <button id="newTestamentBtn">
+                New Testament
+            </button>
+        </div>
+
+        <div>
+            <button id="dividingTheWordBtn">
+                Dividing The Word (Coming Soon!)
+            </button>
+        </div>
+
+        <!-- NEW: Shutdown Server Button -->
+        <button id="shutdownServerBtn">
+            Shutdown Server
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            const lastReadLink = document.getElementById('lastReadLink');
+            const oldTestamentBtn = document.getElementById('oldTestamentBtn');
+            const newTestamentBtn = document.getElementById('newTestamentBtn');
+            const dividingTheWordBtn = document.getElementById('dividingTheWordBtn');
+            const shutdownServerBtn = document.getElementById('shutdownServerBtn'); // New: Shutdown button
+
+            // Function to show a custom confirmation dialog
+            const showConfirmDialog = (message, onConfirm) => {
+                const modalOverlay = document.createElement('div');
+                modalOverlay.classList.add('modal-overlay');
+                modalOverlay.innerHTML = `
+                    <div class="modal-content">
+                        <p>${message}</p>
+                        <div class="modal-buttons">
+                            <button class="confirm-btn">Confirm</button>
+                            <button class="cancel-btn">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modalOverlay);
+
+                modalOverlay.querySelector('.confirm-btn').addEventListener('click', () => {
+                    onConfirm(true);
+                    modalOverlay.remove();
+                });
+                modalOverlay.querySelector('.cancel-btn').addEventListener('click', () => {
+                    onConfirm(false);
+                    modalOverlay.remove();
+                });
+            };
+
+            // Function to show a simple message box (used previously for alert replacements)
+            const showMessageBox = (message) => {
+                const messageBox = document.createElement('div');
+                messageBox.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background-color: white; padding: 20px; border: 1px solid #ccc;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000;
+                `;
+                messageBox.innerHTML = `<p>${message}</p><button onclick="this.parentNode.remove()">OK</button>`;
+                document.body.appendChild(messageBox);
+            };
+
+
+            // Load last read chapter from local storage
+            const lastRead = JSON.parse(localStorage.getItem('lastRead'));
+            if (lastRead) {
+                // Use simplified URL format from lastRead data
+                lastReadLink.href = `/${lastRead.bookAbbr}.${lastRead.chapterNum}.${lastRead.versionAbbr}`;
+                // Now directly set the innerHTML of the link
+                lastReadLink.innerHTML = `Last read: ${lastRead.bookName} Chapter ${lastRead.chapterNum} (${lastRead.versionAbbr})`;
+            } else {
+                // Default to Genesis 1 NKJV using simplified URL
+                lastReadLink.href = "/GEN.1.NKJV";
+                lastReadLink.innerHTML = `Start Reading`; // Directly set text for the link
+            }
+
+            searchInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    const searchTerm = searchInput.value.trim();
+                    if (searchTerm) {
+                        const chapterMatch = searchTerm.match(/([A-Z0-9]+)\s*(\d+)/i);
+                        if (chapterMatch) {
+                            const bookAbbr = chapterMatch[1].toUpperCase();
+                            const chapterNum = parseInt(chapterMatch[2]);
+                            // Use simplified URL format with NKJV as default version
+                            window.location.href = `/${bookAbbr}.${chapterNum}.NKJV`;
+                        } else {
+                           showMessageBox('Searching for: ' + searchTerm);
+                        }
+                    }
+                }
+            });
+
+            // Redirect to default NKJV simplified URLs
+            oldTestamentBtn.addEventListener('click', () => {
+                window.location.href = "/GEN.1.NKJV";
+            });
+
+            newTestamentBtn.addEventListener('click', () => {
+                window.location.href = "/MAT.1.NKJV";
+            });
+
+            dividingTheWordBtn.addEventListener('click', () => {
+                showMessageBox("Dividing The Word functionality would go here!");
+            });
+
+            // NEW: Event listener for Shutdown Server Button
+            shutdownServerBtn.addEventListener('click', () => {
+                showConfirmDialog("Are you sure you want to shut down the Bible.EX server? This will close the application.", (confirmed) => {
+                    if (confirmed) {
+                        fetch('/api/shutdown', {
+                            method: 'POST', // Use POST for actions that change server state
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                showMessageBox("Server is shutting down. The browser tab will now become unresponsive. You can close this tab.");
+                                // Optionally, disable further interactions or redirect after shutdown
+                                setTimeout(() => {
+                                    // You could try closing the window, but browsers often block this for security
+                                    // window.close();
+                                }, 2000);
+                            } else {
+                                showMessageBox("Failed to send shutdown request. Server might already be down or there was an error.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error sending shutdown request:', error);
+                            showMessageBox("Error connecting to server for shutdown. It might already be down.");
+                        });
+                    } else {
+                        showMessageBox("Server shutdown cancelled.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
