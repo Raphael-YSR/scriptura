@@ -68,7 +68,7 @@
         .main-content-wrapper {
             flex-grow: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Default to column for single view */
             overflow-x: hidden; /* Prevent horizontal scroll due to split views */
         }
 
@@ -102,6 +102,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 5px; /* Added rounded corners */
+        }
+        .menu-button:hover {
+            opacity: 0.8;
         }
 
         /* Main content area */
@@ -118,11 +122,30 @@
             padding: 0 10px; /* Spacing between split views */
             border-right: 1px solid #eee; /* Divider for split views */
             overflow-y: auto; /* Individual scrolling for split views */
+            display: flex; /* Always flex to control content, default to column for single */
+            flex-direction: column; /* Content inside should flow vertically */
         }
         .chapter-view:last-child {
             border-right: none; /* No border on the last view */
         }
+        /* Hide views that are not active in split mode */
+        .chapter-view:not(.active-view-split):not(.active-view-single) {
+            display: none; 
+        }
+        /* The primary single view is always displayed as active-view-single */
+        .chapter-view.active-view-single {
+            display: flex;
+        }
         
+        .chapter-view h3 {
+            margin-top: 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            font-size: 1.1em; /* Slightly smaller for split view titles */
+            color: #555;
+        }
+
         .nav-buttons {
             display: flex;
             justify-content: space-between;
@@ -170,6 +193,17 @@
             background-color: #ccc;
             margin: 10px 0;
         }
+        
+        /* Styles for the split screen options in sidebar */
+        #splitScreenOptions label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+        #splitScreenOptions select {
+            flex-grow: 1; /* Allow select to take available space */
+        }
     </style>
 </head>
 <body data-book-abbr="" data-chapter-num="" data-translation-id="" data-version-abbr="" data-total-chapters="">
@@ -198,6 +232,7 @@
                     Back to Main
                 </a>
                 <h1 id="chapterTitle"><!-- SERVER_INJECTED_CHAPTER_TITLE --></h1>
+                <!-- Removed bookNameSubtitle as it's replaced by h3 in chapter views -->
             </div>
             <div>
                 <!-- Chapter Selection Dropdown -->
@@ -209,21 +244,21 @@
         </header>
 
         <main id="mainContent">
-            <!-- Default single view -->
-            <div id="singleChapterView" class="chapter-view">
-                <h2 id="bookNameSubtitle"></h2>
+            <!-- Default single view - now also acts as View 1 in split mode -->
+            <div id="singleChapterView" class="chapter-view active-view-single">
+                <h3 id="singleViewVersionName"></h3> <!-- To display version name in split mode -->
                 <div id="chapter-content">
                     <!-- SERVER_INJECTED_CHAPTER_CONTENT -->
                 </div>
             </div>
 
             <!-- Split view containers (hidden by default, managed by JS) -->
-            <div id="splitChapterView2" class="chapter-view" style="display:none;">
-                <label>Version: <select class="versionSelectSplit" data-view="2"></select></label>
+            <div id="splitChapterView2" class="chapter-view">
+                <h3 id="splitView2VersionName"></h3>
                 <div class="chapter-content-split"></div>
             </div>
-            <div id="splitChapterView3" class="chapter-view" style="display:none;">
-                <label>Version: <select class="versionSelectSplit" data-view="3"></select></label>
+            <div id="splitChapterView3" class="chapter-view">
+                <h3 id="splitView3VersionName"></h3>
                 <div class="chapter-content-split"></div>
             </div>
         </main>
@@ -254,25 +289,28 @@
                 <input type="checkbox" id="continuousToggle">
             </label>
         </div>
-        <div>
-            <button id="splitScreenBtn">Split Screen</button>
-        </div>
-        <div id="splitScreenOptions" style="display: none;">
-            <h4>Split View Versions:</h4>
-            <!-- Default versions, to be managed by JS -->
+        <div class="divider"></div>
+        <h4>Split Screen Views</h4>
+        <div id="splitScreenOptions">
             <div>
-                <label>View 1 (NKJV): </label>
-                <select id="versionSelectView1" class="versionSelectSplit" data-view="1">
-                    <option value="NKJV">NKJV</option>
-                </select>
+                <label>
+                    <span>View 1 (Default): </span>
+                    <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
+                </label>
             </div>
             <div>
-                <label>View 2 (AMP): </label>
-                <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
+                <label>
+                    <span>View 2 (AMP by default): </span>
+                    <input type="checkbox" id="toggleView2">
+                    <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
+                </label>
             </div>
             <div>
-                <label>View 3 (TPT): </label>
-                <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
+                <label>
+                    <span>View 3 (TPT by default): </span>
+                    <input type="checkbox" id="toggleView3">
+                    <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
+                </label>
             </div>
             <!-- Toggle to minimize version names -->
             <label>
