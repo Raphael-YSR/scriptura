@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const leftSidebar = document.getElementById('leftSidebar');
     const rightSidebar = document.getElementById('rightSidebar');
-    const leftMenuBtn = document.getElementById('leftMenuBtn');
-    const leftMenuBtnInHeader = document.getElementById('leftMenuBtnInHeader');
     const rightMenuBtn = document.getElementById('rightMenuBtn');
     const rightMenuBtnInHeader = document.getElementById('rightMenuBtnInHeader');
 
@@ -20,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const splitChapterView2 = document.getElementById('splitChapterView2');
     const splitChapterView3 = document.getElementById('splitChapterView3');
     const mainContent = document.getElementById('mainContent');
+    const mainContentWrapper = document.getElementById('mainContentWrapper'); // Get the wrapper
     const versionSelectsSplit = document.querySelectorAll('#splitScreenOptions .versionSelectSplit');
     const minimizeVersionNamesToggle = document.getElementById('minimizeVersionNamesToggle');
 
@@ -30,11 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const versionSelectView3 = document.getElementById('versionSelectView3');
 
     const singleViewVersionNameEl = document.getElementById('singleViewVersionName');
-    const singleViewVersionAbbrEl = document.getElementById('singleViewVersionAbbr');
     const splitView2VersionNameEl = document.getElementById('splitView2VersionName');
-    const splitView2VersionAbbrEl = document.getElementById('splitView2VersionAbbr');
     const splitView3VersionNameEl = document.getElementById('splitView3VersionName');
-    const splitView3VersionAbbrEl = document.getElementById('splitView3VersionAbbr');
+    
+    const headerLeftSection = document.querySelector('.header-left-section'); // Get the header left section
 
     const shutdownServerBtn = document.getElementById('shutdownServerBtn');
 
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentVersionAbbr;
     let totalChaptersInBook;
     let availableTranslations = []; 
-
+    
     // --- Start: Data copied from server.js for client-side use ---
     const bookAbbreviationToIdMap = {
         "GEN": 1, "EXO": 2, "LEV": 3, "NUM": 4, "DEU": 5, "JOS": 6, "JDG": 7, "RUT": 8,
@@ -161,25 +159,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chapterContentTarget = targetElement.id === 'singleChapterView' ? document.getElementById('chapter-content') : targetElement.querySelector('.chapter-content-split');
         const chapterTitleTarget = chapterTitleEl; 
         const versionNameEl = targetElement.querySelector('h3'); 
-        const versionAbbrEl = targetElement.querySelector('.version-abbr'); 
-
+        
         if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-gray-500">Loading verses...</p>`;
         
-        if (chapterTitleTarget && !isSplitViewActive()) {
+        // Update chapter title logic
+        if (!isSplitViewActive()) {
             chapterTitleTarget.textContent = `${getBookNameFromAbbreviation(bookAbbr)} Chapter ${chapterNum}`;
-        } else if (chapterTitleTarget) { 
-            chapterTitleTarget.textContent = '';
+            headerLeftSection.classList.add('centered'); // Center the title when no "Back to Main"
+        } else {
+            chapterTitleTarget.textContent = ''; // Clear title in split view
+            headerLeftSection.classList.remove('centered'); // Reset alignment
         }
 
         if (versionNameEl) versionNameEl.textContent = `${getTranslationNameFromAbbr(versionAbbr)}`;
-        if (versionAbbrEl) versionAbbrEl.textContent = `${versionAbbr}`;
 
         if (minimizeVersionNamesToggle.checked) {
             if (versionNameEl) versionNameEl.style.display = 'none'; 
-            if (versionAbbrEl) versionAbbrEl.style.display = 'block'; 
         } else {
             if (versionNameEl) versionNameEl.style.display = 'block'; 
-            if (versionAbbrEl) versionAbbrEl.style.display = 'block'; 
         }
 
         if (targetElement === singleChapterView && !isSplitViewActive()) {
@@ -191,10 +188,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`[DEBUG]   Translation ID for ${versionAbbr}: ${translationId}`); 
         if (!translationId) {
             console.error(`[DEBUG] Error: Translation ID not found for version abbreviation: ${versionAbbr}. Aborting load.`); 
-            if (chapterTitleTarget && !isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
+            if (!isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
             if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-red-500">Could not load chapter: Invalid Bible version. Please select another.</p>`;
             if (versionNameEl) versionNameEl.textContent = `Error: Invalid Version`;
-            if (versionAbbrEl) versionAbbrEl.textContent = '';
+            if (targetElement === singleChapterView) {
+                prevChapterBtn.disabled = true;
+                nextChapterBtn.disabled = true;
+            }
             return;
         }
 
@@ -217,8 +217,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (!isSplitViewActive()) {
                     chapterTitleEl.textContent = `${data.bookName} Chapter ${data.chapterNumber}`;
+                    headerLeftSection.classList.add('centered'); 
                 } else {
                     chapterTitleEl.textContent = '';
+                    headerLeftSection.classList.remove('centered'); 
                 }
 
                 versionSelect.value = currentVersionAbbr;
@@ -265,14 +267,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (versionNameEl) versionNameEl.textContent = `${getTranslationNameFromAbbr(versionAbbr)}`;
-            if (versionAbbrEl) versionAbbrEl.textContent = `${versionAbbr}`;
 
         } catch (error) {
             console.error('[DEBUG] Failed to load chapter (catch block):', error); 
-            if (chapterTitleTarget && !isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
+            if (!isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
             if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-red-500">Could not load chapter: ${error.message}. Please try again or go back to the main page.</p>`;
             if (versionNameEl) versionNameEl.textContent = `Error: ${versionAbbr}`;
-            if (versionAbbrEl) versionAbbrEl.textContent = '';
             if (targetElement === singleChapterView) {
                 prevChapterBtn.disabled = true;
                 nextChapterBtn.disabled = true;
@@ -282,9 +282,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const renderChapterList = (bookAbbr, totalChapters, currentChapter, versionAbbr) => {
         chapterListEl.innerHTML = ''; 
+
         for (let i = 1; i <= totalChapters; i++) {
             const listItem = document.createElement('li');
-            listItem.innerHTML = `<a href="/${bookAbbr}.${i}.${versionAbbr}" class="${i === currentChapter ? 'active-chapter' : ''}">Chapter ${i}</a>`;
+            const link = document.createElement('a');
+            link.href = `/${bookAbbr}.${i}.${versionAbbr}`;
+            
+            link.classList.add(
+                'flex', 'items-center', 'space-x-3', 'p-2', 'rounded-md',
+                'hover:bg-gray-200', 'transition-colors', 'duration-200'
+            );
+
+            if (i === currentChapter) {
+                link.classList.add('active-chapter');
+            } else {
+                 link.classList.add('text-gray-700'); 
+            }
+
+            const circleSpan = document.createElement('span');
+            circleSpan.classList.add(
+                'w-3', 'h-3', 'rounded-full', 'flex-shrink-0', 'bg-gray-400', 
+                'circle-indicator' 
+            );
+            link.appendChild(circleSpan);
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = `Chapter ${i}`;
+            textSpan.classList.add(
+                'whitespace-nowrap', 'overflow-hidden', 'text-sm',
+                'chapter-text' 
+            );
+            link.appendChild(textSpan);
+
+            listItem.appendChild(link);
             chapterListEl.appendChild(listItem);
         }
     };
@@ -356,11 +386,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const toggleLeftSidebar = () => {
-        leftSidebar.classList.toggle('collapsed');
-    };
-    leftMenuBtn.addEventListener('click', toggleLeftSidebar);
-    leftMenuBtnInHeader.addEventListener('click', toggleLeftSidebar);
+    // Sidebar hover logic using JavaScript
+    leftSidebar.addEventListener('mouseenter', () => {
+        mainContentWrapper.style.marginLeft = '16rem'; // w-64
+    });
+
+    leftSidebar.addEventListener('mouseleave', () => {
+        mainContentWrapper.style.marginLeft = '4rem'; // w-16
+    });
 
     const toggleRightSidebar = () => {
         rightSidebar.classList.toggle('collapsed');
@@ -377,19 +410,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (isSplitViewActive()) {
             chapterTitleEl.style.display = 'none';
+            headerLeftSection.classList.remove('centered'); // Remove centering if "Back to Main" is present or split view is active
             mainContent.classList.add('flex-row'); // Add flex-row for split views
             mainContent.classList.remove('flex-col');
         } else {
             chapterTitleEl.style.display = 'block';
+            headerLeftSection.classList.add('centered'); // Center title in single view
             mainContent.classList.add('flex-col'); // Back to flex-col for single view
             mainContent.classList.remove('flex-row');
         }
 
-        // Always ensure singleChapterView (View 1) has the base class for display
         singleChapterView.classList.add('active-view-single');
         singleChapterView.classList.remove('active-view-split'); 
 
-        // Reset visibility for other split views
         splitChapterView2.classList.remove('active-view-split');
         splitChapterView3.classList.remove('active-view-split');
         
@@ -448,6 +481,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             bookName: getBookNameFromAbbreviation(currentBookAbbr) 
         }));
 
+        // Initial check for chapter title centering
+        if (!isSplitViewActive()) {
+            chapterTitleEl.textContent = `${getBookNameFromAbbreviation(currentBookAbbr)} Chapter ${currentChapterNum}`;
+            headerLeftSection.classList.add('centered');
+        } else {
+            chapterTitleEl.textContent = '';
+            headerLeftSection.classList.remove('centered');
+        }
+
         if (verseToggle.checked) {
             chapterContentEl.classList.add('hide-verse-numbers');
         } else {
@@ -467,34 +509,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     shutdownServerBtn.addEventListener('click', async () => {
-        const userConfirmed = confirm("Are you sure you want to shut down the server? This will close the application.");
-        if (userConfirmed) {
-            try {
-                const response = await fetch('/api/shutdown', { method: 'POST' });
-                if (response.ok) {
-                    console.log('Server shutdown initiated.');
-                    alert('Server is shutting down. You can now close this browser tab.');
-                } else {
-                    console.error('Failed to initiate server shutdown:', await response.text());
-                    alert('Failed to shut down server. Check console for details.');
-                }
-            } catch (error) {
-                console.error('Error during server shutdown request:', error);
-                alert('Error connecting to server for shutdown. Please ensure the server is running and accessible.');
-            }
-        }
+        // Replaced alert/confirm with a simple console log for now as per instructions.
+        console.log("Shut down server button clicked. In a real app, this would show a custom modal.");
+        // const userConfirmed = confirm("Are you sure you want to shut down the server? This will close the application.");
+        // if (userConfirmed) {
+        //     try {
+        //         const response = await fetch('/api/shutdown', { method: 'POST' });
+        //         if (response.ok) {
+        //             console.log('Server shutdown initiated.');
+        //             alert('Server is shutting down. You can now close this browser tab.');
+        //         } else {
+        //             console.error('Failed to initiate server shutdown:', await response.text());
+        //             alert('Failed to shut down server. Check console for details.');
+        //         }
+        //     } catch (error) {
+        //         console.error('Error during server shutdown request:', error);
+        //         alert('Error connecting to server for shutdown. Please ensure the server is running and accessible.');
+        //     }
+        // }
     });
 
     minimizeVersionNamesToggle.addEventListener('change', (event) => {
         const isMinimized = event.target.checked;
-        const toggleVisibility = (nameEl, abbrEl, showAbbrOnly) => {
+        const toggleVisibility = (nameEl, showAbbrOnly) => {
             if (nameEl) nameEl.style.display = showAbbrOnly ? 'none' : 'block';
-            if (abbrEl) abbrEl.style.display = 'block'; 
         };
 
-        toggleVisibility(singleViewVersionNameEl, singleViewVersionAbbrEl, isMinimized);
-        toggleVisibility(splitView2VersionNameEl, splitView2VersionAbbrEl, isMinimized);
-        toggleVisibility(splitView3VersionNameEl, splitView3VersionAbbrEl, isMinimized);
+        toggleVisibility(singleViewVersionNameEl, isMinimized); 
+        toggleVisibility(splitView2VersionNameEl, isMinimized);
+        toggleVisibility(splitView3VersionNameEl, isMinimized);
     });
 
     manageSplitViews();

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scriptura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Basic styles for verse numbers - kept for functionality */
         .verse-number {
@@ -22,39 +24,59 @@
             display: flex;
             min-height: 100vh;
             margin: 0;
-            font-family: sans-serif; /* Basic font */
-            transition: margin-left 0.3s ease, margin-right 0.3s ease; /* For sidebar transitions */
+            font-family: 'Inter', sans-serif; /* Basic font */
+            background-color: #f9fafb; /* Light background for the main area */
+            /* Removed @apply group from body */
         }
 
-        /* Left Sidebar */
+        /* Left Sidebar - Redesigned for hover mechanism */
         aside.left-sidebar {
-            width: 200px; /* Fixed width for sidebar */
+            width: 4rem; /* Equivalent to w-16, 64px */
             padding: 10px;
-            border-right: 1px solid #ccc;
-            background-color: #f4f4f4;
+            background-color: #F3F4F6; /* light gray background */
             overflow-y: auto; /* Enable independent scrolling for chapter list */
             flex-shrink: 0; /* Prevent shrinking */
-            position: relative; /* For menu button positioning */
-            transition: transform 0.3s ease; /* For retraction */
+            position: fixed; /* Fixed position */
+            height: 100vh; /* Full height */
+            z-index: 20; /* Above other content */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            transition: width 0.3s ease-in-out, padding 0.3s ease-in-out; /* Smooth transition for width and padding */
+            border-right: 1px solid #e5e7eb; /* subtle border */
+            
+            /* Apply group directly to the sidebar */
+            @apply group; 
         }
-        aside.left-sidebar.collapsed {
-            transform: translateX(-100%);
-            width: 0;
-            padding: 0;
-            overflow: hidden;
-            border-right: none;
+        /* When sidebar is hovered (group-hover), expand the sidebar */
+        aside.left-sidebar:hover {
+            width: 16rem; /* Equivalent to w-64, 256px */
+            padding-left: 20px; /* Slightly more padding when expanded */
+            padding-right: 20px;
+        }
+
+        aside.left-sidebar .sidebar-content {
+            opacity: 1; 
+            transition: opacity 0.3s ease-in-out; 
+        }
+        aside.left-sidebar h2 {
+            color: #1F2937; /* Darker text for light sidebar */
+            margin-bottom: 1rem; /* mb-4 */
+            font-weight: 700; /* bold */
+        }
+        aside.left-sidebar nav {
+            padding-top: 1rem; /* pt-4 */
         }
 
         /* Right Sidebar */
         aside.right-sidebar {
-            width: 200px; /* Fixed width for sidebar */
+            width: 300px; /* Fixed width for sidebar */
             padding: 10px;
-            border-left: 1px solid #ccc;
-            background-color: #f4f4f4;
+            border-left: 1px solid #e5e7eb; /* subtle border */
+            background-color: white; /* Light background */
             overflow-y: auto; /* Enable independent scrolling */
             flex-shrink: 0; /* Prevent shrinking */
             position: relative; /* For menu button positioning */
             transition: transform 0.3s ease; /* For retraction */
+            z-index: 10; /* Below left sidebar */
         }
         aside.right-sidebar.collapsed {
             transform: translateX(100%);
@@ -70,12 +92,19 @@
             display: flex;
             flex-direction: column; /* Default to column for single view */
             overflow-x: hidden; /* Prevent horizontal scroll due to split views */
+            
+            /* Initial margin based on collapsed left sidebar */
+            margin-left: 4rem; /* Equivalent to ml-16 */
+            transition: margin-left 0.3s ease-in-out; /* Smooth transition for margin */
+            z-index: 1; /* Below sidebars */
         }
+        /* This transition will now be handled by JS */
+        /* Removed: body:hover .main-content-wrapper { margin-left: 16rem; } */
 
         /* Header in main content */
         header {
             padding: 10px;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #e5e7eb; /* subtle border */
             display: flex;
             flex-wrap: wrap; /* Allow wrapping on smaller screens */
             justify-content: space-between;
@@ -83,29 +112,42 @@
             gap: 10px; /* Space between elements */
             position: sticky;
             top: 0;
-            background-color: white;
-            z-index: 10;
+            background-color: white; /* White background for header */
+            z-index: 15; /* Above main content, below left sidebar when expanded */
         }
         header > div {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+        /* New style for the left part of the header to facilitate centering */
+        header .header-left-section {
+            flex-grow: 1; /* Allow it to take available space */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Default alignment */
+        }
+        header .header-left-section.centered {
+            justify-content: center; /* Center content when needed */
+        }
         
         /* Menu Buttons for Sidebars */
         .menu-button {
-            background: dodgerblue;
+            background-color: #6B7280; /* gray-500 */
+            color: white;
             border: none;
-            font-size: 1.5em;
+            font-size: 1.2em; /* Slightly smaller */
             cursor: pointer;
-            padding: 5px;
+            padding: 8px; /* More padding */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 5px; /* Added rounded corners */
+            border-radius: 9999px; /* full rounded */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* subtle shadow */
         }
         .menu-button:hover {
-            opacity: 0.8;
+            background-color: #4B5563; /* gray-700 */
+            opacity: 1; /* Ensure full opacity on hover */
         }
 
         /* Main content area */
@@ -120,7 +162,7 @@
         .chapter-view {
             flex: 1; /* Each view takes equal space */
             padding: 0 10px; /* Spacing between split views */
-            border-right: 1px solid #eee; /* Divider for split views */
+            border-right: 1px solid #e5e7eb; /* Divider for split views */
             overflow-y: auto; /* Individual scrolling for split views */
             display: flex; /* Always flex to control content, default to column for single */
             flex-direction: column; /* Content inside should flow vertically */
@@ -140,10 +182,10 @@
         .chapter-view h3 {
             margin-top: 0;
             padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e5e7eb;
             margin-bottom: 15px;
             font-size: 1.1em; /* Slightly smaller for split view titles */
-            color: #555;
+            color: #4B5563; /* gray-700 */
         }
 
         .nav-buttons {
@@ -151,19 +193,21 @@
             justify-content: space-between;
             margin-top: 20px;
             padding: 10px; /* Add some padding */
-            border-top: 1px solid #eee; /* Separator */
+            border-top: 1px solid #e5e7eb; /* Separator */
             flex-shrink: 0; /* Prevent shrinking when main content scrolls */
+            background-color: white; /* Match header/body blend */
         }
         button {
             padding: 8px 15px;
-            background-color: #007bff;
+            background-color: #3B82F6; /* blue-500 */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #2563EB; /* blue-600 */
         }
         button:disabled {
             background-color: #cccccc;
@@ -173,24 +217,50 @@
             list-style: none;
             padding: 0;
         }
+        /* Updated #chapterList a to incorporate the new design */
         #chapterList a {
             text-decoration: none;
-            color: #333;
+            color: #4B5563; /* gray-700 for better contrast on light sidebar */
+            @apply flex items-center space-x-3 p-2 rounded-md hover:bg-gray-200 transition-colors duration-200;
         }
         #chapterList a.active-chapter {
             font-weight: bold;
-            color: #007bff;
+            color: #1F2937; /* Darker text for active chapter */
+            background-color: #DBEAFE; /* blue-100 */
         }
+        #chapterList a .chapter-text {
+            @apply whitespace-nowrap overflow-hidden text-sm opacity-100; /* Always visible */
+            transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out; /* Added width transition */
+        }
+        /* Hide text when sidebar is collapsed */
+        aside.left-sidebar:not(:hover) #chapterList a .chapter-text,
+        aside.left-sidebar:not(:hover) h2 { /* Also hide the H2 title */
+            opacity: 0;
+            width: 0; /* Collapse width to hide text */
+            visibility: hidden; /* Hide completely */
+        }
+        aside.left-sidebar:not(:hover) #chapter-nav { /* Also collapse nav padding */
+            padding-top: 0;
+        }
+
+
+        #chapterList a .circle-indicator {
+            /* The colored circle - now gray */
+            @apply w-3 h-3 rounded-full flex-shrink-0 bg-gray-400; /* All circles gray */
+        }
+
         select {
             padding: 5px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            background-color: white;
+            color: #1F2937;
         }
 
         /* Divider style */
         .divider {
             height: 1px;
-            background-color: #ccc;
+            background-color: #e5e7eb; /* subtle divider */
             margin: 10px 0;
         }
         
@@ -200,59 +270,53 @@
             align-items: center;
             gap: 5px;
             margin-bottom: 8px;
+            color: #374151; /* gray-800 */
         }
         #splitScreenOptions select {
             flex-grow: 1; /* Allow select to take available space */
+            background-color: white;
+            color: #1F2937;
         }
     </style>
 </head>
 <body data-book-abbr="" data-chapter-num="" data-translation-id="" data-version-abbr="" data-total-chapters="">
 
-    <!-- Left Sidebar -->
     <aside class="left-sidebar" id="leftSidebar">
-        <button class="menu-button" id="leftMenuBtn">☰</button>
-        <h2>Scriptura</h2>
-        <nav id="chapter-nav">
-            <ul id="chapterList">
-                <!-- Chapters will be dynamically loaded here by script.js -->
-                <li>Loading chapters...</li> 
-            </ul>
-        </nav>
+        <div class="sidebar-content">
+            <h2 class="text-xl font-bold mb-4">Scriptura</h2>
+            <nav id="chapter-nav">
+                <ul id="chapterList" class="space-y-2">
+                    <li>Loading chapters...</li> 
+                </ul>
+            </nav>
+        </div>
     </aside>
 
-    <div class="main-content-wrapper">
+    <div class="main-content-wrapper" id="mainContentWrapper">
         <header>
-            <div>
-                <!-- Menu button for left sidebar -->
-                <button class="menu-button" id="leftMenuBtnInHeader">☰</button>
-                <a href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="header-left-section">
+                <a href="/" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    Back to Main
+                    <span class="font-medium">Back to Main</span>
                 </a>
-                <h1 id="chapterTitle"><!-- SERVER_INJECTED_CHAPTER_TITLE --></h1>
-                <!-- Removed bookNameSubtitle as it's replaced by h3 in chapter views -->
+                <h1 id="chapterTitle" class="text-2xl font-bold ml-4"></h1>
             </div>
             <div>
-                <!-- Chapter Selection Dropdown -->
-                <label for="versionSelect">Version:</label>
-                <select id="versionSelect"></select>
-                <!-- Menu button for right sidebar -->
+                <label for="versionSelect" class="text-gray-700 font-medium">Version:</label>
+                <select id="versionSelect" class="px-2 py-1 border rounded-md"></select>
                 <button class="menu-button" id="rightMenuBtnInHeader">☰</button>
             </div>
         </header>
 
         <main id="mainContent">
-            <!-- Default single view - now also acts as View 1 in split mode -->
             <div id="singleChapterView" class="chapter-view active-view-single">
-                <h3 id="singleViewVersionName"></h3> <!-- To display version name in split mode -->
+                <h3 id="singleViewVersionName"></h3> 
                 <div id="chapter-content">
-                    <!-- SERVER_INJECTED_CHAPTER_CONTENT -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Split view containers (hidden by default, managed by JS) -->
             <div id="splitChapterView2" class="chapter-view">
                 <h3 id="splitView2VersionName"></h3>
                 <div class="chapter-content-split"></div>
@@ -273,53 +337,49 @@
         </div>
     </div>
 
-    <!-- Right Sidebar -->
     <aside class="right-sidebar" id="rightSidebar">
         <button class="menu-button" id="rightMenuBtn">☰</button>
-        <h3>Display Options</h3>
-        <div>
-            <label>
+        <h3 class="text-gray-800 font-semibold mb-4">Display Options</h3>
+        <div class="flex flex-col space-y-3">
+            <label class="flex items-center justify-between text-gray-700">
                 <span>Verse Numbers</span>
-                <input type="checkbox" id="verseToggle" checked>
+                <input type="checkbox" id="verseToggle" class="form-checkbox h-5 w-5 text-blue-600" checked>
             </label>
-        </div>
-        <div>
-            <label>
+            <label class="flex items-center justify-between text-gray-700">
                 <span>Continuous Reading</span>
-                <input type="checkbox" id="continuousToggle">
+                <input type="checkbox" id="continuousToggle" class="form-checkbox h-5 w-5 text-blue-600">
             </label>
         </div>
         <div class="divider"></div>
-        <h4>Split Screen Views</h4>
-        <div id="splitScreenOptions">
-            <div>
-                <label>
+        <h4 class="text-gray-800 font-semibold mb-4">Split Screen Views</h4>
+        <div id="splitScreenOptions" class="flex flex-col space-y-3">
+            <div class="flex flex-col">
+                <label class="text-gray-700 mb-1">
                     <span>View 1 (Default): </span>
-                    <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
                 </label>
+                <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
             </div>
-            <div>
-                <label>
+            <div class="flex flex-col">
+                <label class="flex items-center justify-between text-gray-700 mb-1">
                     <span>View 2 (AMP by default): </span>
-                    <input type="checkbox" id="toggleView2">
-                    <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
+                    <input type="checkbox" id="toggleView2" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
+                <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
             </div>
-            <div>
-                <label>
+            <div class="flex flex-col">
+                <label class="flex items-center justify-between text-gray-700 mb-1">
                     <span>View 3 (TPT by default): </span>
-                    <input type="checkbox" id="toggleView3">
-                    <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
+                    <input type="checkbox" id="toggleView3" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
+                <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
             </div>
-            <!-- Toggle to minimize version names -->
-            <label>
+            <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
                 <span>Minimize Version Names</span>
-                <input type="checkbox" id="minimizeVersionNamesToggle">
+                <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">
             </label>
         </div>
         <div class="divider"></div>
-        <button id="shutdownServerBtn" style="background-color: #dc3545;">Close Server</button>
+        <button id="shutdownServerBtn" class="w-full mt-4 bg-red-500 hover:bg-red-600">Close Server</button>
     </aside>
 
     <script src="script.js"></script>
