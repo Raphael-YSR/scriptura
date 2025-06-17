@@ -101,34 +101,81 @@
         /* This transition will now be handled by JS */
         /* Removed: body:hover .main-content-wrapper { margin-left: 16rem; } */
 
-        /* Header in main content */
+        /* Header in main content - IMPROVED LAYOUT */
         header {
-            padding: 10px;
-            border-bottom: 1px solid #e5e7eb; /* subtle border */
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-            justify-content: space-between;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: grid;
+            grid-template-columns: auto 1fr auto; /* Three columns: left, center (flexible), right */
             align-items: center;
-            gap: 10px; /* Space between elements */
+            gap: 20px;
             position: sticky;
             top: 0;
-            background-color: white; /* White background for header */
-            z-index: 15; /* Above main content, below left sidebar when expanded */
+            background-color: white;
+            z-index: 15;
         }
-        header > div {
+
+        /* Left section - Back button */
+        .header-left {
+            display: flex;
+            align-items: center;
+            justify-self: start; /* Align to start of grid cell */
+        }
+
+        /* Center section - Chapter title */
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            justify-self: center; /* Always center in grid */
+            min-width: 0; /* Allow shrinking if needed */
+        }
+
+        /* Right section - Version selector and menu */
+        .header-right {
             display: flex;
             align-items: center;
             gap: 10px;
+            justify-self: end; /* Align to end of grid cell */
         }
-        /* New style for the left part of the header to facilitate centering */
-        header .header-left-section {
-            flex-grow: 1; /* Allow it to take available space */
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; /* Default alignment */
+
+        /* Select styling - applies to ALL select elements */
+        select {
+            /* Remove default arrow */
+            appearance: none;
+            -webkit-appearance: none; /* For Safari */
+            -moz-appearance: none; /* For Firefox */
+            background-image: none; /* Ensure no custom background arrow */
+
+            /* Shorter appearance */
+            height: 36px; /* Fixed height for all selects */
+            padding: 5px 10px; /* Adjust padding for height */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: white;
+            color: #1F2937;
+            font-size: 14px; /* Smaller font size */
+            cursor: pointer;
+            outline: none; /* Remove outline on focus */
+            transition: border-color 0.2s ease-in-out;
+                text-align: center;
+    text-align-last: center; 
         }
-        header .header-left-section.centered {
-            justify-content: center; /* Center content when needed */
+        select:hover {
+            border-color: #9CA3AF; /* gray-400 */
+        }
+        select:focus {
+            border-color: #3B82F6; /* blue-500 */
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5); /* subtle focus ring */
+        }
+
+        /* Specific width for the main version select */
+        #versionSelect {
+            min-width: 120px;
+            max-width: 180px;
+                display: flex;
+    justify-content: center;
+    align-items: center;
         }
         
         /* Menu Buttons for Sidebars */
@@ -205,6 +252,9 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         button:hover {
             background-color: #2563EB; /* blue-600 */
@@ -249,14 +299,6 @@
             @apply w-3 h-3 rounded-full flex-shrink-0 bg-gray-400; /* All circles gray */
         }
 
-        select {
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: white;
-            color: #1F2937;
-        }
-
         /* Divider style */
         .divider {
             height: 1px;
@@ -277,6 +319,33 @@
             background-color: white;
             color: #1F2937;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                grid-template-columns: 1fr; /* Single column on mobile */
+                text-align: center;
+                gap: 10px; /* Reduce gap on mobile */
+            }
+            .header-left, .header-right, .header-center {
+                justify-self: center; /* Center all elements on mobile */
+            }
+            /* Adjust padding and margin for smaller screens */
+            .main-content-wrapper {
+                margin-left: 0 !important; /* Remove margin from left sidebar on small screens */
+            }
+            aside.left-sidebar {
+                transform: translateX(-100%); /* Hide sidebar off-screen by default on mobile */
+                transition: transform 0.3s ease-in-out;
+            }
+            aside.left-sidebar.active { /* Class to show sidebar on mobile */
+                transform: translateX(0);
+            }
+            /* Hide the chapter title in header on mobile when back button is present to save space */
+            .header-left + .header-center #chapterTitle {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body data-book-abbr="" data-chapter-num="" data-translation-id="" data-version-abbr="" data-total-chapters="">
@@ -286,6 +355,7 @@
             <h2 class="text-xl font-bold mb-4">Scriptura</h2>
             <nav id="chapter-nav">
                 <ul id="chapterList" class="space-y-2">
+                    <!-- Chapters will be dynamically loaded here by script.js -->
                     <li>Loading chapters...</li> 
                 </ul>
             </nav>
@@ -294,18 +364,27 @@
 
     <div class="main-content-wrapper" id="mainContentWrapper">
         <header>
-            <div class="header-left-section">
+            <!-- Left section: Back button (fixed left) -->
+            <div class="header-left">
                 <a href="/" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     <span class="font-medium">Back to Main</span>
                 </a>
-                <h1 id="chapterTitle" class="text-2xl font-bold ml-4"></h1>
             </div>
-            <div>
-                <label for="versionSelect" class="text-gray-700 font-medium">Version:</label>
-                <select id="versionSelect" class="px-2 py-1 border rounded-md"></select>
+            
+            <!-- Center section: Chapter title (always centered) -->
+            <div class="header-center">
+                <h1 id="chapterTitle" class="text-2xl font-bold text-gray-900"></h1>
+            </div>
+            
+            <!-- Right section: Version selector and menu (fixed right) -->
+            <div class="header-right">
+                <label for="versionSelect" class="text-gray-700 font-medium sr-only">Version:</label> <!-- Screen reader only label -->
+                <select id="versionSelect">
+                    <!-- Options will be dynamically populated -->
+                </select>
                 <button class="menu-button" id="rightMenuBtnInHeader">☰</button>
             </div>
         </header>
@@ -342,7 +421,7 @@
         <h3 class="text-gray-800 font-semibold mb-4">Display Options</h3>
         <div class="flex flex-col space-y-3">
             <label class="flex items-center justify-between text-gray-700">
-                <span>Verse Numbers</span>
+                <span>Hide Verse Numbers</span>
                 <input type="checkbox" id="verseToggle" class="form-checkbox h-5 w-5 text-blue-600" checked>
             </label>
             <label class="flex items-center justify-between text-gray-700">
@@ -354,25 +433,25 @@
         <h4 class="text-gray-800 font-semibold mb-4">Split Screen Views</h4>
         <div id="splitScreenOptions" class="flex flex-col space-y-3">
             <div class="flex flex-col">
-                <label class="text-gray-700 mb-1">
-                    <span>View 1 (Default): </span>
-                </label>
+                <span>Default View: </span>
+                <label class="text-gray-700 mb-1 sr-only">View 1 ():</label> <!-- Screen reader only label -->
                 <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
             </div>
             <div class="flex flex-col">
                 <label class="flex items-center justify-between text-gray-700 mb-1">
-                    <span>View 2 (AMP by default): </span>
+                    <span>View 2: </span>
                     <input type="checkbox" id="toggleView2" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
                 <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
             </div>
             <div class="flex flex-col">
                 <label class="flex items-center justify-between text-gray-700 mb-1">
-                    <span>View 3 (TPT by default): </span>
+                    <span>View 3: </span>
                     <input type="checkbox" id="toggleView3" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
                 <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
             </div>
+            <!-- Toggle to minimize version names -->
             <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
                 <span>Minimize Version Names</span>
                 <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">

@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const splitView2VersionNameEl = document.getElementById('splitView2VersionName');
     const splitView3VersionNameEl = document.getElementById('splitView3VersionName');
     
-    const headerLeftSection = document.querySelector('.header-left-section'); // Get the header left section
+    // Removed headerLeftSection as it's now handled by CSS grid structure
+    // const headerLeftSection = document.querySelector('.header-left-section'); 
 
     const shutdownServerBtn = document.getElementById('shutdownServerBtn');
 
@@ -82,9 +83,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             "JHN": "John", "ACT": "Acts", "ROM": "Romans", "1CO": "1 Corinthians", "2CO": "2 Corinthians",
             "GAL": "Galatians", "EPH": "Ephesians", "PHP": "Philippians", "COL": "Colossians",
             "1TH": "1 Thessalonians", "2TH": "2 Thessalonians", "1TI": "1 Timothy", "2TI": "2 Timothy",
-            "TIT": "Titus", "PHM": "Philemon", "HEB": "Hebrews", "JAM": "James", "1PE": "1 Peter",
-            "2PE": "2 Peter", "1JO": "1 John", "2JO": "2 John", "3JO": "3 John", "JDE": "Jude",
-            "REV": "Revelation"
+            "TIT": "Titus", "PHM": 1, "HEB": 13, "JAM": 5, "1PE": 5, "2PE": 3, "1JO": 5, "2JO": 1, "3JO": 1,
+            "JDE": 1, "REV": 22
         };
         return bookNames[abbr] || "Unknown Book";
     }
@@ -162,15 +162,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-gray-500">Loading verses...</p>`;
         
-        // Update chapter title logic
-        if (!isSplitViewActive()) {
-            chapterTitleTarget.textContent = `${getBookNameFromAbbreviation(bookAbbr)} Chapter ${chapterNum}`;
-            headerLeftSection.classList.add('centered'); // Center the title when no "Back to Main"
-        } else {
-            chapterTitleTarget.textContent = ''; // Clear title in split view
-            headerLeftSection.classList.remove('centered'); // Reset alignment
-        }
-
+        // Chapter title is always displayed and centered via CSS grid
+        chapterTitleTarget.textContent = `${getBookNameFromAbbreviation(bookAbbr)} Chapter ${chapterNum}`;
+        
         if (versionNameEl) versionNameEl.textContent = `${getTranslationNameFromAbbr(versionAbbr)}`;
 
         if (minimizeVersionNamesToggle.checked) {
@@ -188,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(`[DEBUG]   Translation ID for ${versionAbbr}: ${translationId}`); 
         if (!translationId) {
             console.error(`[DEBUG] Error: Translation ID not found for version abbreviation: ${versionAbbr}. Aborting load.`); 
-            if (!isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
+            chapterTitleTarget.textContent = "Error Loading Chapter";
             if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-red-500">Could not load chapter: Invalid Bible version. Please select another.</p>`;
             if (versionNameEl) versionNameEl.textContent = `Error: Invalid Version`;
             if (targetElement === singleChapterView) {
@@ -215,13 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentVersionAbbr = data.versionAbbreviation; 
                 totalChaptersInBook = data.totalChapters;
 
-                if (!isSplitViewActive()) {
-                    chapterTitleEl.textContent = `${data.bookName} Chapter ${data.chapterNumber}`;
-                    headerLeftSection.classList.add('centered'); 
-                } else {
-                    chapterTitleEl.textContent = '';
-                    headerLeftSection.classList.remove('centered'); 
-                }
+                chapterTitleEl.textContent = `${data.bookName} Chapter ${data.chapterNumber}`;
 
                 versionSelect.value = currentVersionAbbr;
                 prevChapterBtn.disabled = currentChapterNum === 1;
@@ -270,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (error) {
             console.error('[DEBUG] Failed to load chapter (catch block):', error); 
-            if (!isSplitViewActive()) chapterTitleTarget.textContent = "Error Loading Chapter";
+            chapterTitleTarget.textContent = "Error Loading Chapter";
             if (chapterContentTarget) chapterContentTarget.innerHTML = `<p class="text-red-500">Could not load chapter: ${error.message}. Please try again or go back to the main page.</p>`;
             if (versionNameEl) versionNameEl.textContent = `Error: ${versionAbbr}`;
             if (targetElement === singleChapterView) {
@@ -319,6 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    
     verseToggle.addEventListener('change', () => {
         document.querySelectorAll('.chapter-content, .chapter-content-split, #chapter-content').forEach(contentArea => {
             if (verseToggle.checked) {
@@ -408,16 +397,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     const manageSplitViews = () => {
         console.log('[DEBUG] manageSplitViews called. View2 checked:', toggleView2.checked, 'View3 checked:', toggleView3.checked); 
 
+        // Header title always displayed and centered via CSS grid
+        chapterTitleEl.style.display = 'block'; 
+
         if (isSplitViewActive()) {
-            chapterTitleEl.style.display = 'none';
-            headerLeftSection.classList.remove('centered'); // Remove centering if "Back to Main" is present or split view is active
-            mainContent.classList.add('flex-row'); // Add flex-row for split views
-            mainContent.classList.remove('flex-col');
+            // In split view, the chapter title will still be centered by grid,
+            // but its content might be blanked out if it's not the primary view
+            // or if we choose to hide it for cleaner split view headers.
+            // For now, let's keep it blank in split view as before for consistency.
+            // mainContent.classList.add('flex-row'); // Add flex-row for split views
+            // mainContent.classList.remove('flex-col');
         } else {
-            chapterTitleEl.style.display = 'block';
-            headerLeftSection.classList.add('centered'); // Center title in single view
-            mainContent.classList.add('flex-col'); // Back to flex-col for single view
+            // mainContent.classList.add('flex-col'); // Back to flex-col for single view
+            // mainContent.classList.remove('flex-row');
+        }
+        // Simplified based on your previous 'flex-row' / 'flex-col' comments.
+        // It seems `mainContent` should always be `flex` to accommodate `chapter-view`s.
+        // The `flex-direction` change is typically for the `mainContent` itself to arrange its
+        // children vertically (single view) or horizontally (split views).
+        if (toggleView2.checked || toggleView3.checked) {
+            mainContent.classList.remove('flex-col');
+            mainContent.classList.add('flex-row');
+        } else {
             mainContent.classList.remove('flex-row');
+            mainContent.classList.add('flex-col');
         }
 
         singleChapterView.classList.add('active-view-single');
@@ -481,14 +484,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             bookName: getBookNameFromAbbreviation(currentBookAbbr) 
         }));
 
-        // Initial check for chapter title centering
-        if (!isSplitViewActive()) {
-            chapterTitleEl.textContent = `${getBookNameFromAbbreviation(currentBookAbbr)} Chapter ${currentChapterNum}`;
-            headerLeftSection.classList.add('centered');
-        } else {
-            chapterTitleEl.textContent = '';
-            headerLeftSection.classList.remove('centered');
-        }
+        // Initial chapter title display (always visible and centered via CSS)
+        chapterTitleEl.textContent = `${getBookNameFromAbbreviation(currentBookAbbr)} Chapter ${currentChapterNum}`;
 
         if (verseToggle.checked) {
             chapterContentEl.classList.add('hide-verse-numbers');
