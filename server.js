@@ -32,7 +32,7 @@ pool.connect((err, client, release) => {
 });
 
 // --- Helper Data and Mappings (Server-side) ---
-// Hardcoded mapping from book abbreviation to book ID
+// Hardcoded mapping from book abbreviation to book ID (Corrected based on db.md)
 const bookAbbreviationToIdMap = {
     "GEN": 1, "EXO": 2, "LEV": 3, "NUM": 4, "DEU": 5, "JOS": 6, "JDG": 7, "RUT": 8,
     "1SA": 9, "2SA": 10, "1KI": 11, "2KI": 12, "1CH": 13, "2CH": 14, "EZR": 15, "NEH": 16,
@@ -45,48 +45,51 @@ const bookAbbreviationToIdMap = {
     "3JO": 64, "JDE": 65, "REV": 66
 };
 
-// Hardcoded mapping from translation abbreviation to translation ID
+// Hardcoded mapping from translation abbreviation to translation ID (Corrected based on db.md)
 const translationAbbreviationToIdMap = {
     "KJV": 1,
     "NIV": 2,
-    "NKJV": 3, // NKJV ID
+    "NKJV": 3,
     "AMP": 4,
     "AMPC": 5,
     "TPT": 6,
     "ESV": 7,
 };
 
-// Hardcoded mapping from translation ID to abbreviation
+// Hardcoded mapping from translation ID to abbreviation (Corrected based on db.md)
 const translationIdToAbbreviationMap = {
     1: "KJV",
     2: "NIV",
-    3: "NKJV", // NKJV ID
+    3: "NKJV",
     4: "AMP",
     5: "AMPC",
     6: "TPT",
     7: "ESV",
 };
 
-// Function to get the full book name from its abbreviation
+// Function to get the full book name from its abbreviation (Corrected based on db.md)
 function getBookNameFromAbbreviation(abbr) {
     const bookNames = {
         "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
         "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
         "1KI": "1 Kings", "2KI": "2 Kings", "1CH": "1 Chronicles", "2CH": "2 Chronicles",
         "EZR": "Ezra", "NEH": "Nehemiah", "EST": "Esther", "JOB": "Job", "PSA": "Psalms",
-        "PRO": "Proverbs", "ECC": "Ecclesiastes", "SNG": "Song of Solomon", "ISA": "Isaiah",
+        "PRO": "Proverbs", "ECC": "Ecclesiastes", "SNG": "Song of Songs", "ISA": "Isaiah", // Corrected SNG
         "JER": "Jeremiah", "LAM": "Lamentations", "EZE": "Ezekiel", "DAN": "Daniel",
-        "HOS": "Hosea", "JOL": 3, "AMO": 9, "OBA": 1, "JON": 4, // Corrected "JOL" from 29 to 3 as per db.md
-        "MIC": 7, "NAH": 3, "HAB": 3, "ZEP": 3, "HAG": 2, "ZEC": 14, "MAL": 4, "MAT": 28,
-        "MAR": 16, "LUK": 24, "JHN": 21, "ACT": 28, "ROM": 16, "1CO": 16, "2CO": 13, "GAL": 6,
-        "EPH": 6, "PHP": 4, "COL": 4, "1TH": 5, "2TH": 3, "1TI": 6, "2TI": 4, "TIT": 3,
-        "PHM": 1, "HEB": 13, "JAM": 5, "1PE": 5, "2PE": 3, "1JO": 5, "2JO": 1, "3JO": 1,
-        "JDE": 1, "REV": 22
+        "HOS": "Hosea", "JOL": "Joel", "AMO": "Amos", "OBA": "Obadiah", "JON": "Jonah",
+        "MIC": "Micah", "NAH": "Nahum", "HAB": "Habakkuk", "ZEP": "Zephaniah", "HAG": "Haggai",
+        "ZEC": "Zechariah", "MAL": "Malachi", "MAT": "Matthew", "MAR": "Mark", "LUK": "Luke",
+        "JHN": "John", "ACT": "Acts", "ROM": "Romans", "1CO": "1 Corinthians", "2CO": "2 Corinthians",
+        "GAL": "Galatians", "EPH": "Ephesians", "PHP": "Philippians", "COL": "Colossians",
+        "1TH": "1 Thessalonians", "2TH": "2 Thessalonians", "1TI": "1 Timothy", "2TI": "2 Timothy",
+        "TIT": "Titus", "PHM": "Philemon", "HEB": "Hebrews", "JAM": "James", "1PE": "1 Peter",
+        "2PE": "2 Peter", "1JO": "1 John", "2JO": "2 John", "3JO": "3 John", // Corrected PHM, HEB, JAM, 1PE, 2PE, 1JO, 2JO, 3JO
+        "JDE": "Jude", "REV": "Revelation" // Corrected JDE, REV
     };
     return bookNames[abbr] || "Unknown Book";
 }
 
-// Hardcoded chapter counts for each book
+// Hardcoded chapter counts for each book (Corrected based on db.md)
 const bookChapterCounts = {
     "GEN": 50, "EXO": 40, "LEV": 27, "NUM": 36, "DEU": 34, "JOS": 24, "JDG": 21, "RUT": 4,
     "1SA": 31, "2SA": 24, "1KI": 22, "2KI": 25, "1CH": 29, "2CH": 36, "EZR": 10, "NEH": 13,
@@ -140,7 +143,6 @@ app.get('/:bookAbbr.:chapterNum.:versionAbbr', async (req, res) => {
             WHERE bookid = $1 AND chapternumber = $2 AND translationid = $3
             ORDER BY versenumber;
         `;
-        // Fix: Use 'translationId' instead of 'parsedTranslationId'
         const result = await pool.query(query, [bookId, parsedChapterNum, translationId]);
 
         const verses = result.rows.map(row => ({
@@ -167,23 +169,18 @@ app.get('/:bookAbbr.:chapterNum.:versionAbbr', async (req, res) => {
         // 3. Inject the fetched data into the HTML
         // Update document title
         chapterHtmlContent = chapterHtmlContent.replace(
-            '<title>Bible.EX - Chapter</title>',
-            `<title>Bible.EX - ${fullBookName} Chapter ${parsedChapterNum} (${versionAbbrCaps})</title>`
+            '<title>Scriptura</title>', // Original title in chapter.html
+            `<title>Scriptura - ${fullBookName} Chapter ${parsedChapterNum} (${versionAbbrCaps})</title>`
         );
-        // Update header title
+        // Update header title (chapterTitleEl on client side)
         chapterHtmlContent = chapterHtmlContent.replace(
-            '<!-- SERVER_INJECTED_CHAPTER_TITLE -->',
-            `${fullBookName} Chapter ${parsedChapterNum}`
-        );
-        // Update book name subtitle
-        chapterHtmlContent = chapterHtmlContent.replace(
-            '<h2 id="bookNameSubtitle"></h2>',
-            `<h2 id="bookNameSubtitle">${fullBookName} (${versionAbbrCaps})</h2>`
+            '<h1 id="chapterTitle" class="text-2xl font-bold text-gray-900"></h1>', // This is for client-side update
+            `<h1 id="chapterTitle" class="text-2xl font-bold text-gray-900">${fullBookName} Chapter ${parsedChapterNum}</h1>`
         );
         // Update chapter content
         chapterHtmlContent = chapterHtmlContent.replace(
-            '<!-- SERVER_INJECTED_CHAPTER_CONTENT -->',
-            versesHtml
+            '<div id="chapter-content"></div>', // Empty div on client side
+            `<div id="chapter-content">${versesHtml}</div>`
         );
 
         // Inject data attributes for client-side script.js
@@ -226,7 +223,6 @@ app.get('/chapter.html', (req, res) => {
         res.redirect('/GEN.1.NKJV');
     }
 });
-
 
 // API endpoint to get chapter verses data from the database (still needed for client-side navigation)
 app.get('/api/chapter', async (req, res) => {
@@ -290,6 +286,46 @@ app.get('/api/translations', async (req, res) => {
         res.status(500).json({ error: 'Failed to retrieve translations.', details: err.message });
     }
 });
+
+// NEW: API endpoint to get all books for a specific testament
+app.get('/api/books/:testament', async (req, res) => {
+    const { testament } = req.params;
+    let testamentId;
+
+    if (testament.toLowerCase() === 'old-testament') {
+        testamentId = 1;
+    } else if (testament.toLowerCase() === 'new-testament') {
+        testamentId = 2;
+    } else {
+        return res.status(400).json({ error: 'Invalid testament specified. Use "old-testament" or "new-testament".' });
+    }
+
+    try {
+        const query = `
+            SELECT bookid, name, abbreviation, chapters
+            FROM books
+            WHERE testamentid = $1
+            ORDER BY bookid;
+        `;
+        const result = await pool.query(query, [testamentId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(`Database query error (books API for ${testament}):`, err);
+        res.status(500).json({ error: `Failed to retrieve books for ${testament}.`, details: err.message });
+    }
+});
+
+
+// NEW: Route for Old Testament Books list page
+app.get('/old-testament', (req, res) => {
+    res.sendFile(path.join(__dirname, 'old_testament.html'));
+});
+
+// NEW: Route for New Testament Books list page
+app.get('/new-testament', (req, res) => {
+    res.sendFile(path.join(__dirname, 'new_testament.html'));
+});
+
 
 // NEW: Shutdown endpoint for local development
 app.post('/api/shutdown', (req, res) => {

@@ -142,10 +142,11 @@
         </div>
 
         <div>
-            <button id="oldTestamentBtn">
+            <!-- Updated buttons to link to the new testament book list pages -->
+            <button id="oldTestamentBtn" onclick="window.location.href='/old-testament'">
                 Old Testament
             </button>
-            <button id="newTestamentBtn">
+            <button id="newTestamentBtn" onclick="window.location.href='/new-testament'">
                 New Testament
             </button>
         </div>
@@ -166,8 +167,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.getElementById('searchInput');
             const lastReadLink = document.getElementById('lastReadLink');
-            const oldTestamentBtn = document.getElementById('oldTestamentBtn');
-            const newTestamentBtn = document.getElementById('newTestamentBtn');
+            // Old and New Testament buttons now use inline onclick for direct navigation
             const dividingTheWordBtn = document.getElementById('dividingTheWordBtn');
             const shutdownServerBtn = document.getElementById('shutdownServerBtn'); // New: Shutdown button
 
@@ -237,15 +237,6 @@
                         }
                     }
                 }
-            });
-
-            // Redirect to default NKJV simplified URLs
-            oldTestamentBtn.addEventListener('click', () => {
-                window.location.href = "/GEN.1.NKJV";
-            });
-
-            newTestamentBtn.addEventListener('click', () => {
-                window.location.href = "/MAT.1.NKJV";
             });
 
             dividingTheWordBtn.addEventListener('click', () => {

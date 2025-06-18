@@ -32,9 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const splitView2VersionNameEl = document.getElementById('splitView2VersionName');
     const splitView3VersionNameEl = document.getElementById('splitView3VersionName');
     
-    // Removed headerLeftSection as it's now handled by CSS grid structure
-    // const headerLeftSection = document.querySelector('.header-left-section'); 
-
     const shutdownServerBtn = document.getElementById('shutdownServerBtn');
 
     let currentTranslationId;
@@ -44,16 +41,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     let totalChaptersInBook;
     let availableTranslations = []; 
     
-    // --- Start: Data copied from server.js for client-side use ---
+    // --- Start: Data copied from server.js for client-side use (Corrected based on db.md) ---
     const bookAbbreviationToIdMap = {
         "GEN": 1, "EXO": 2, "LEV": 3, "NUM": 4, "DEU": 5, "JOS": 6, "JDG": 7, "RUT": 8,
         "1SA": 9, "2SA": 10, "1KI": 11, "2KI": 12, "1CH": 13, "2CH": 14, "EZR": 15, "NEH": 16,
-        "EST": 17, "JOB": 18, "PSA": 150, "PRO": 31, "ECC": 12, "SNG": 8, "ISA": 66, "JER": 52,
-        "LAM": 5, "EZE": 48, "DAN": 12, "HOS": 14, "JOL": 3, "AMO": 9, "OBA": 1, "JON": 4,
-        "MIC": 7, "NAH": 3, "HAB": 3, "ZEP": 3, "HAG": 2, "ZEC": 14, "MAL": 4, "MAT": 28,
-        "MAR": 16, "LUK": 24, "JHN": 21, "ACT": 28, "ROM": 16, "1CO": 16, "2CO": 13, "GAL": 6,
-        "EPH": 6, "PHP": 4, "COL": 4, "1TH": 5, "2TH": 3, "1TI": 6, "2TI": 4, "TIT": 3,
-        "PHM": 1, "HEB": 13, "JAM": 5, "1PE": 5, "2PE": 61, "1JO": 62, "2JO": 63, 
+        "EST": 17, "JOB": 18, "PSA": 19, "PRO": 20, "ECC": 21, "SNG": 22, "ISA": 23, "JER": 24,
+        "LAM": 25, "EZE": 26, "DAN": 27, "HOS": 28, "JOL": 29, "AMO": 30, "OBA": 31, "JON": 32,
+        "MIC": 33, "NAH": 34, "HAB": 35, "ZEP": 36, "HAG": 37, "ZEC": 38, "MAL": 39,
+        "MAT": 40, "MAR": 41, "LUK": 42, "JHN": 43, "ACT": 44, "ROM": 45, "1CO": 46, "2CO": 47,
+        "GAL": 48, "EPH": 49, "PHP": 50, "COL": 51, "1TH": 52, "2TH": 53, "1TI": 54, "2TI": 55,
+        "TIT": 56, "PHM": 57, "HEB": 58, "JAM": 59, "1PE": 60, "2PE": 61, "1JO": 62, "2JO": 63,
         "3JO": 64, "JDE": 65, "REV": 66
     };
 
@@ -71,20 +68,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function getBookNameFromAbbreviation(abbr) {
         const bookNames = {
-            "GEN": "Genesis", "EXO": "Exodus", "LEV": "Leviticus", "NUM": "Numbers", "DEU": "Deuteronomy",
-            "JOS": "Joshua", "JDG": "Judges", "RUT": "Ruth", "1SA": "1 Samuel", "2SA": "2 Samuel",
-            "1KI": "1 Kings", "2KI": "2 Kings", "1CH": "1 Chronicles", "2CH": "2 Chronicles",
-            "EZR": "Ezra", "NEH": "Nehemiah", "EST": "Esther", "JOB": "Job", "PSA": "Psalms",
-            "PRO": "Proverbs", "ECC": "Ecclesiastes", "SNG": "Song of Solomon", "ISA": "Isaiah",
-            "JER": "Jeremiah", "LAM": "Lamentations", "EZE": "Ezekiel", "DAN": "Daniel",
-            "HOS": "Hosea", "JOL": "Joel", "AMO": "Amos", "OBA": "Obadiah", "JON": "Jonah",
-            "MIC": "Micah", "NAH": "Nahum", "HAB": "Habakkuk", "ZEP": "Zephaniah", "HAG": "Haggai",
-            "ZEC": "Zechariah", "MAL": "Malachi", "MAT": "Matthew", "MAR": "Mark", "LUK": "Luke",
-            "JHN": "John", "ACT": "Acts", "ROM": "Romans", "1CO": "1 Corinthians", "2CO": "2 Corinthians",
-            "GAL": "Galatians", "EPH": "Ephesians", "PHP": "Philippians", "COL": "Colossians",
-            "1TH": "1 Thessalonians", "2TH": "2 Thessalonians", "1TI": "1 Timothy", "2TI": "2 Timothy",
-            "TIT": "Titus", "PHM": 1, "HEB": 13, "JAM": 5, "1PE": 5, "2PE": 3, "1JO": 5, "2JO": 1, "3JO": 1,
-            "JDE": 1, "REV": 22
+            "GEN": "Genesis", 
+            "EXO": "Exodus", 
+            "LEV": "Leviticus", 
+            "NUM": "Numbers", 
+            "DEU": "Deuteronomy",
+            "JOS": "Joshua", 
+            "JDG": "Judges", 
+            "RUT": "Ruth", 
+            "1SA": "1 Samuel", 
+            "2SA": "2 Samuel",
+            "1KI": "1 Kings", 
+            "2KI": "2 Kings", 
+            "1CH": "1 Chronicles", 
+            "2CH": "2 Chronicles",
+            "EZR": "Ezra", 
+            "NEH": "Nehemiah", 
+            "EST": "Esther", 
+            "JOB": "Job", 
+            "PSA": "Psalms",
+            "PRO": "Proverbs", 
+            "ECC": "Ecclesiastes", 
+            "SNG": "Song of Songs", 
+            "ISA": "Isaiah", // Corrected SNG
+            "JER": "Jeremiah", 
+            "LAM": "Lamentations", 
+            "EZE": "Ezekiel", 
+            "DAN": "Daniel",
+            "HOS": "Hosea", 
+            "JOL": "Joel", 
+            "AMO": "Amos", 
+            "OBA": "Obadiah", 
+            "JON": "Jonah",
+            "MIC": "Micah", 
+            "NAH": "Nahum", 
+            "HAB": "Habakkuk", 
+            "ZEP": "Zephaniah", 
+            "HAG": "Haggai",
+            "ZEC": "Zechariah", 
+            "MAL": "Malachi", 
+            "MAT": "Matthew", 
+            "MAR": "Mark", 
+            "LUK": "Luke",
+            "JHN": "John", 
+            "ACT": "Acts", 
+            "ROM": "Romans", 
+            "1CO": "1 Corinthians", 
+            "2CO": "2 Corinthians",
+            "GAL": "Galatians", 
+            "EPH": "Ephesians", 
+            "PHP": "Philippians", 
+            "COL": "Colossians",
+            "1TH": "1 Thessalonians", 
+            "2TH": "2 Thessalonians", 
+            "1TI": "1 Timothy", 
+            "2TI": "2 Timothy",
+            "TIT": "Titus", 
+            "PHM": "Philemon", 
+            "HEB": "Hebrews", 
+            "JAM": "James", 
+            "1PE": "1 Peter",
+            "2PE": "2 Peter", 
+            "1JO": "1 John", 
+            "2JO": "2 John", 
+            "3JO": "3 John", 
+            "JDE": "Jude",
+            "REV": "Revelation"
         };
         return bookNames[abbr] || "Unknown Book";
     }
@@ -365,6 +414,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const updateSplitViews = (bookAbbr, chapterNum) => {
+        // Ensure the main view is also reloaded when split views are updated,
+        // so its content aligns with the selected versions.
         loadChapter(bookAbbr, chapterNum, versionSelectView1.value, singleChapterView, false);
 
         if (toggleView2.checked) {
@@ -400,21 +451,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Header title always displayed and centered via CSS grid
         chapterTitleEl.style.display = 'block'; 
 
-        if (isSplitViewActive()) {
-            // In split view, the chapter title will still be centered by grid,
-            // but its content might be blanked out if it's not the primary view
-            // or if we choose to hide it for cleaner split view headers.
-            // For now, let's keep it blank in split view as before for consistency.
-            // mainContent.classList.add('flex-row'); // Add flex-row for split views
-            // mainContent.classList.remove('flex-col');
-        } else {
-            // mainContent.classList.add('flex-col'); // Back to flex-col for single view
-            // mainContent.classList.remove('flex-row');
-        }
-        // Simplified based on your previous 'flex-row' / 'flex-col' comments.
-        // It seems `mainContent` should always be `flex` to accommodate `chapter-view`s.
-        // The `flex-direction` change is typically for the `mainContent` itself to arrange its
-        // children vertically (single view) or horizontally (split views).
         if (toggleView2.checked || toggleView3.checked) {
             mainContent.classList.remove('flex-col');
             mainContent.classList.add('flex-row');
@@ -423,30 +459,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             mainContent.classList.add('flex-col');
         }
 
+        // Ensure singleChapterView is always shown and primary
         singleChapterView.classList.add('active-view-single');
         singleChapterView.classList.remove('active-view-split'); 
 
-        splitChapterView2.classList.remove('active-view-split');
-        splitChapterView3.classList.remove('active-view-split');
-        
+        // Manage visibility and content for split views
+        splitChapterView2.classList.remove('active-view-split'); // Always remove first
         if (toggleView2.checked) {
             console.log('[DEBUG] View 2 toggle checked. Activating splitChapterView2.'); 
             splitChapterView2.classList.add('active-view-split');
+            // Ensure content is loaded if view becomes active
             loadChapter(currentBookAbbr, currentChapterNum, versionSelectView2.value, splitChapterView2, false);
         }
 
+        splitChapterView3.classList.remove('active-view-split'); // Always remove first
         if (toggleView3.checked) {
             console.log('[DEBUG] View 3 toggle checked. Activating splitChapterView3.'); 
+            // If view 3 is checked, but view 2 is not, activate view 2 as well
             if (!toggleView2.checked) {
                 console.log('[DEBUG] Auto-activating View 2 as View 3 is checked.'); 
-                toggleView2.checked = true; 
+                toggleView2.checked = true; // Programmatically check the box
                 splitChapterView2.classList.add('active-view-split');
                 loadChapter(currentBookAbbr, currentChapterNum, versionSelectView2.value, splitChapterView2, false);
             }
             splitChapterView3.classList.add('active-view-split');
+            // Ensure content is loaded if view becomes active
             loadChapter(currentBookAbbr, currentChapterNum, versionSelectView3.value, splitChapterView3, false);
         }
 
+        // Always reload the default view to ensure its content is correct after split view changes
         loadChapter(currentBookAbbr, currentChapterNum, versionSelectView1.value, singleChapterView, false);
     };
 
@@ -499,31 +540,82 @@ document.addEventListener('DOMContentLoaded', async () => {
         const initialVersionAbbr = urlParams.get('version') || 'NKJV';
 
         if (initialBookAbbr && !isNaN(initialChapterNum)) {
+            // Correct the redirection to use the simplified URL format
             window.location.replace(`/${initialBookAbbr.toUpperCase()}.${initialChapterNum}.${initialVersionAbbr.toUpperCase()}`);
         } else {
+            // Default to Genesis 1 NKJV using simplified URL
             window.location.replace('/GEN.1.NKJV');
         }
     }
 
-    shutdownServerBtn.addEventListener('click', async () => {
-        // Replaced alert/confirm with a simple console log for now as per instructions.
-        console.log("Shut down server button clicked. In a real app, this would show a custom modal.");
-        // const userConfirmed = confirm("Are you sure you want to shut down the server? This will close the application.");
-        // if (userConfirmed) {
-        //     try {
-        //         const response = await fetch('/api/shutdown', { method: 'POST' });
-        //         if (response.ok) {
-        //             console.log('Server shutdown initiated.');
-        //             alert('Server is shutting down. You can now close this browser tab.');
-        //         } else {
-        //             console.error('Failed to initiate server shutdown:', await response.text());
-        //             alert('Failed to shut down server. Check console for details.');
-        //         }
-        //     } catch (error) {
-        //         console.error('Error during server shutdown request:', error);
-        //         alert('Error connecting to server for shutdown. Please ensure the server is running and accessible.');
-        //     }
-        // }
+    // Custom Modal Functions (re-added for use with shutdown button)
+    const showConfirmDialog = (message, onConfirm) => {
+        const modalOverlay = document.createElement('div');
+        modalOverlay.classList.add('modal-overlay');
+        modalOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center;
+            align-items: center; z-index: 1000;
+        `;
+        modalOverlay.innerHTML = `
+            <div class="modal-content" style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); text-align: center; max-width: 400px; width: 90%;">
+                <p style="margin-bottom: 20px; font-size: 1.1rem;">${message}</p>
+                <div class="modal-buttons">
+                    <button class="confirm-btn" style="margin: 0 10px; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; background-color: #dc3545; color: white;">Confirm</button>
+                    <button class="cancel-btn" style="margin: 0 10px; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; background-color: #6c757d; color: white;">Cancel</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalOverlay);
+
+        modalOverlay.querySelector('.confirm-btn').addEventListener('click', () => {
+            onConfirm(true);
+            modalOverlay.remove();
+        });
+        modalOverlay.querySelector('.cancel-btn').addEventListener('click', () => {
+            onConfirm(false);
+            modalOverlay.remove();
+        });
+    };
+
+    const showMessageBox = (message) => {
+        const messageBox = document.createElement('div');
+        messageBox.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: white; padding: 20px; border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; z-index: 1000;
+        `;
+        messageBox.innerHTML = `<p>${message}</p><button onclick="this.parentNode.remove()" style="padding: 8px 15px; background-color: #3B82F6; color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>`;
+        document.body.appendChild(messageBox);
+    };
+
+    shutdownServerBtn.addEventListener('click', () => {
+        showConfirmDialog("Are you sure you want to shut down the Scriptura server? This will close the application.", (confirmed) => {
+            if (confirmed) {
+                fetch('/api/shutdown', {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showMessageBox("Server is shutting down. The browser tab will now become unresponsive. You can close this tab.");
+                        setTimeout(() => {
+                            // window.close(); // Browsers usually block this for security
+                        }, 2000);
+                    } else {
+                        showMessageBox("Failed to send shutdown request. Server might already be down or there was an error.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending shutdown request:', error);
+                    showMessageBox("Error connecting to server for shutdown. It might already be down.");
+                });
+            } else {
+                showMessageBox("Server shutdown cancelled.");
+            }
+        });
     });
 
     minimizeVersionNamesToggle.addEventListener('change', (event) => {

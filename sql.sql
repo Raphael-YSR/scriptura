@@ -1,29 +1,29 @@
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_NKJV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_NKJV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_KJV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_KJV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_NIV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_NIV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_ESV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_ESV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_TPT.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_TPT.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_AMPC.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_AMPC.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark5_AMP.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_AMP.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 
