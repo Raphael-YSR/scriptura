@@ -19,71 +19,83 @@
             display: none;
         }
 
-        /* Base layout for body to accommodate two sidebars */
+        /* Base layout for body to accommodate two fixed sidebars */
         body {
             display: flex;
             min-height: 100vh;
             margin: 0;
             font-family: 'Inter', sans-serif; /* Basic font */
             background-color: #f9fafb; /* Light background for the main area */
-            /* Removed @apply group from body */
         }
 
-        /* Left Sidebar - Redesigned for hover mechanism */
-        aside.left-sidebar {
-            width: 4rem; /* Equivalent to w-16, 64px */
+        /* Shared Sidebar Styles */
+        aside.left-sidebar, aside.right-sidebar {
+            width: 4rem; /* Collapsed width */
             padding: 10px;
-            background-color: #F3F4F6; /* light gray background */
-            overflow-y: auto; /* Enable independent scrolling for chapter list */
+            overflow-y: auto; /* Enable independent scrolling */
             flex-shrink: 0; /* Prevent shrinking */
             position: fixed; /* Fixed position */
             height: 100vh; /* Full height */
             z-index: 20; /* Above other content */
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
             transition: width 0.3s ease-in-out, padding 0.3s ease-in-out; /* Smooth transition for width and padding */
-            border-right: 1px solid #e5e7eb; /* subtle border */
-            
-            /* Apply group directly to the sidebar */
-            @apply group; 
         }
-        /* When sidebar is hovered (group-hover), expand the sidebar */
+
+        /* Left Sidebar Specific Styles */
+        aside.left-sidebar {
+            left: 0; /* Align to left */
+            background-color: #F3F4F6; /* light gray background */
+            border-right: 1px solid #e5e7eb; /* subtle border */
+        }
         aside.left-sidebar:hover {
-            width: 16rem; /* Equivalent to w-64, 256px */
+            width: 16rem; /* Expanded width */
             padding-left: 20px; /* Slightly more padding when expanded */
             padding-right: 20px;
         }
 
-        aside.left-sidebar .sidebar-content {
-            opacity: 1; 
-            transition: opacity 0.3s ease-in-out; 
+        /* Right Sidebar Specific Styles */
+        aside.right-sidebar {
+            right: 0; /* Align to right */
+            background-color: white; /* Light background */
+            border-left: 1px solid #e5e7eb; /* subtle border */
         }
-        aside.left-sidebar h2 {
-            color: #1F2937; /* Darker text for light sidebar */
-            margin-bottom: 1rem; /* mb-4 */
-            font-weight: 700; /* bold */
-        }
-        aside.left-sidebar nav {
-            padding-top: 1rem; /* pt-4 */
+        aside.right-sidebar:hover {
+            width: 16rem; /* Expanded width */
+            padding-left: 20px;
+            padding-right: 20px;
         }
 
-        /* Right Sidebar */
-        aside.right-sidebar {
-            width: 300px; /* Fixed width for sidebar */
-            padding: 10px;
-            border-left: 1px solid #e5e7eb; /* subtle border */
-            background-color: white; /* Light background */
-            overflow-y: auto; /* Enable independent scrolling */
-            flex-shrink: 0; /* Prevent shrinking */
-            position: relative; /* For menu button positioning */
-            transition: transform 0.3s ease; /* For retraction */
-            z-index: 10; /* Below left sidebar */
+        /* Sidebar Content Hiding/Showing on Hover */
+        /* For right sidebar content */
+        aside.right-sidebar .sidebar-content {
+            opacity: 0; /* Hidden by default */
+            visibility: hidden; /* Hide completely */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         }
-        aside.right-sidebar.collapsed {
-            transform: translateX(100%);
-            width: 0;
-            padding: 0;
-            overflow: hidden;
-            border-left: none;
+        aside.right-sidebar:hover .sidebar-content {
+            opacity: 1; /* Visible on hover */
+            visibility: visible;
+        }
+        /* For left sidebar content (h2 and chapter text) */
+        aside.left-sidebar .sidebar-content h2,
+        aside.left-sidebar .sidebar-content #chapterList a .chapter-text {
+            opacity: 0;
+            width: 0; /* Collapse width to hide text */
+            visibility: hidden; /* Hide completely */
+            transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        aside.left-sidebar:hover .sidebar-content h2,
+        aside.left-sidebar:hover .sidebar-content #chapterList a .chapter-text {
+            opacity: 1;
+            width: auto;
+            visibility: visible;
+        }
+        aside.left-sidebar .sidebar-content #chapter-nav { /* Also collapse nav padding */
+            padding-top: 0;
+            transition: padding-top 0.3s ease-in-out;
+        }
+        aside.left-sidebar:hover .sidebar-content #chapter-nav {
+            padding-top: 1rem;
         }
 
         /* Main Content Wrapper */
@@ -93,13 +105,14 @@
             flex-direction: column; /* Default to column for single view */
             overflow-x: hidden; /* Prevent horizontal scroll due to split views */
             
-            /* Initial margin based on collapsed left sidebar */
-            margin-left: 4rem; /* Equivalent to ml-16 */
-            transition: margin-left 0.3s ease-in-out; /* Smooth transition for margin */
+            /* Initial margins based on collapsed sidebars */
+            margin-left: 4rem;
+            margin-right: 4rem;
+            transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out; /* Smooth transition for margins */
             z-index: 1; /* Below sidebars */
         }
-        /* This transition will now be handled by JS */
-        /* Removed: body:hover .main-content-wrapper { margin-left: 16rem; } */
+        /* JavaScript will handle margin adjustments on sidebar hover */
+
 
         /* Header in main content - IMPROVED LAYOUT */
         header {
@@ -112,6 +125,7 @@
             position: sticky;
             top: 0;
             background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             z-index: 15;
         }
 
@@ -131,7 +145,7 @@
             min-width: 0; /* Allow shrinking if needed */
         }
 
-        /* Right section - Version selector and menu */
+        /* Right section - Version selector */
         .header-right {
             display: flex;
             align-items: center;
@@ -158,8 +172,8 @@
             cursor: pointer;
             outline: none; /* Remove outline on focus */
             transition: border-color 0.2s ease-in-out;
-                text-align: center;
-    text-align-last: center; 
+            text-align: center;
+            text-align-last: center;
         }
         select:hover {
             border-color: #9CA3AF; /* gray-400 */
@@ -173,30 +187,13 @@
         #versionSelect {
             min-width: 120px;
             max-width: 180px;
-                display: flex;
-    justify-content: center;
-    align-items: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4px 15px;
+            min-width: 230px;
         }
         
-        /* Menu Buttons for Sidebars */
-        .menu-button {
-            background-color: #6B7280; /* gray-500 */
-            color: white;
-            border: none;
-            font-size: 1.2em; /* Slightly smaller */
-            cursor: pointer;
-            padding: 8px; /* More padding */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px; /* full rounded */
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* subtle shadow */
-        }
-        .menu-button:hover {
-            background-color: #4B5563; /* gray-700 */
-            opacity: 1; /* Ensure full opacity on hover */
-        }
-
         /* Main content area */
         main {
             padding: 20px;
@@ -224,6 +221,10 @@
         /* The primary single view is always displayed as active-view-single */
         .chapter-view.active-view-single {
             display: flex;
+            max-width: 800px; /* Centered view max-width */
+            margin: 0 auto; /* Center horizontally */
+            border-left: 1px solid #e0e0e0; /* Faint left line */
+            border-right: 1px solid #e0e0e0; /* Faint right line */
         }
         
         .chapter-view h3 {
@@ -244,7 +245,7 @@
             flex-shrink: 0; /* Prevent shrinking when main content scrolls */
             background-color: white; /* Match header/body blend */
         }
-        button {
+        .nav-buttons button { /* Specific style for nav buttons */
             padding: 8px 15px;
             background-color: #3B82F6; /* blue-500 */
             color: white;
@@ -255,11 +256,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            min-width: 150px; /* Added width for buttons */
         }
-        button:hover {
+        .nav-buttons button:hover {
             background-color: #2563EB; /* blue-600 */
         }
-        button:disabled {
+        .nav-buttons button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
@@ -278,24 +280,8 @@
             color: #1F2937; /* Darker text for active chapter */
             background-color: #DBEAFE; /* blue-100 */
         }
-        #chapterList a .chapter-text {
-            @apply whitespace-nowrap overflow-hidden text-sm opacity-100; /* Always visible */
-            transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out; /* Added width transition */
-        }
-        /* Hide text when sidebar is collapsed */
-        aside.left-sidebar:not(:hover) #chapterList a .chapter-text,
-        aside.left-sidebar:not(:hover) h2 { /* Also hide the H2 title */
-            opacity: 0;
-            width: 0; /* Collapse width to hide text */
-            visibility: hidden; /* Hide completely */
-        }
-        aside.left-sidebar:not(:hover) #chapter-nav { /* Also collapse nav padding */
-            padding-top: 0;
-        }
-
-
         #chapterList a .circle-indicator {
-            /* The colored circle - now gray */
+            /* The colored circle - always visible */
             @apply w-3 h-3 rounded-full flex-shrink-0 bg-gray-400; /* All circles gray */
         }
 
@@ -333,13 +319,22 @@
             /* Adjust padding and margin for smaller screens */
             .main-content-wrapper {
                 margin-left: 0 !important; /* Remove margin from left sidebar on small screens */
+                margin-right: 0 !important; /* Remove margin from right sidebar on small screens */
             }
-            aside.left-sidebar {
-                transform: translateX(-100%); /* Hide sidebar off-screen by default on mobile */
-                transition: transform 0.3s ease-in-out;
+            aside.left-sidebar, aside.right-sidebar {
+                transform: translateX(-100%); /* Hide sidebars off-screen by default on mobile */
+                width: 0;
+                padding: 0;
+                overflow: hidden;
             }
-            aside.left-sidebar.active { /* Class to show sidebar on mobile */
+            aside.left-sidebar.active, aside.right-sidebar.active { /* Class to show sidebar on mobile */
                 transform: translateX(0);
+                width: 16rem;
+                padding: 10px; /* Restore padding on active */
+            }
+            aside.right-sidebar.active {
+                right: 0; /* Ensure it stays on the right when active */
+                left: auto;
             }
             /* Hide the chapter title in header on mobile when back button is present to save space */
             .header-left + .header-center #chapterTitle {
@@ -379,18 +374,18 @@
                 <h1 id="chapterTitle" class="text-2xl font-bold text-gray-900"></h1>
             </div>
             
-            <!-- Right section: Version selector and menu (fixed right) -->
+            <!-- Right section: Version selector -->
             <div class="header-right">
                 <label for="versionSelect" class="text-gray-700 font-medium sr-only">Version:</label> <!-- Screen reader only label -->
                 <select id="versionSelect">
                     <!-- Options will be dynamically populated -->
                 </select>
-                <button class="menu-button" id="rightMenuBtnInHeader">☰</button>
+                <!-- Removed rightMenuBtnInHeader button -->
             </div>
         </header>
 
         <main id="mainContent">
-            <div id="singleChapterView" class="chapter-view active-view-single">
+            <div id="singleChapterView" class="chapter-view active-view-single px-10">
                 <h3 id="singleViewVersionName"></h3> 
                 <div id="chapter-content">
                     </div>
@@ -407,58 +402,61 @@
         </main>
 
         <div class="nav-buttons">
-            <button id="prevChapterBtn" class="h-10">
+            <button id="prevChapterBtn">
                 &larr; Previous Chapter
             </button>
-            <button id="nextChapterBtn" class="h-10">
+            <button id="nextChapterBtn">
                 Next Chapter &rarr;
             </button>
         </div>
     </div>
 
     <aside class="right-sidebar" id="rightSidebar">
-        <button class="menu-button" id="rightMenuBtn">☰</button>
-        <h3 class="text-gray-800 font-semibold mb-4">Display Options</h3>
-        <div class="flex flex-col space-y-3">
-            <label class="flex items-center justify-between text-gray-700">
-                <span>Hide Verse Numbers</span>
-                <input type="checkbox" id="verseToggle" class="form-checkbox h-5 w-5 text-blue-600" checked>
-            </label>
-            <label class="flex items-center justify-between text-gray-700">
-                <span>Continuous Reading</span>
-                <input type="checkbox" id="continuousToggle" class="form-checkbox h-5 w-5 text-blue-600">
-            </label>
-        </div>
-        <div class="divider"></div>
-        <h4 class="text-gray-800 font-semibold mb-4">Split Screen Views</h4>
-        <div id="splitScreenOptions" class="flex flex-col space-y-3">
-            <div class="flex flex-col">
-                <span>Default View: </span>
-                <label class="text-gray-700 mb-1 sr-only">View 1 ():</label> <!-- Screen reader only label -->
-                <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
-            </div>
-            <div class="flex flex-col">
-                <label class="flex items-center justify-between text-gray-700 mb-1">
-                    <span>View 2: </span>
-                    <input type="checkbox" id="toggleView2" class="form-checkbox h-5 w-5 text-blue-600">
+        <div class="sidebar-content">
+            <!-- Removed rightMenuBtn button -->
+            <h3 class="text-gray-800 font-semibold mb-4">Display Options</h3>
+            <div class="flex flex-col space-y-3">
+                <label class="flex items-center justify-between text-gray-700">
+                    <span>Hide Verse Numbers</span>
+                    <input type="checkbox" id="verseToggle" class="form-checkbox h-5 w-5 text-blue-600" checked>
                 </label>
-                <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
-            </div>
-            <div class="flex flex-col">
-                <label class="flex items-center justify-between text-gray-700 mb-1">
-                    <span>View 3: </span>
-                    <input type="checkbox" id="toggleView3" class="form-checkbox h-5 w-5 text-blue-600">
+                <label class="flex items-center justify-between text-gray-700">
+                    <span>Continuous Reading</span>
+                    <input type="checkbox" id="continuousToggle" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
-                <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
             </div>
-            <!-- Toggle to minimize version names -->
-            <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
-                <span>Minimize Version Names</span>
-                <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">
-            </label>
+            <div class="divider"></div>
+            <h4 class="text-gray-800 font-semibold mb-4">Split Screen Views</h4>
+            <div id="splitScreenOptions" class="flex flex-col space-y-3">
+                <div class="flex flex-col">
+                    <span>Default View: </span>
+                    <label class="text-gray-700 mb-1 sr-only">View 1 ():</label> <!-- Screen reader only label -->
+                    <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
+                </div>
+                
+                <div class="flex flex-col">
+                    <label class="flex items-center justify-between text-gray-700 mb-1">
+                        <span>View 2: </span>
+                        <input type="checkbox" id="toggleView2" class="form-checkbox h-5 w-5 text-blue-600">
+                    </label>
+                    <select id="versionSelectView2" class="versionSelectSplit" data-view="2"></select>
+                </div>
+                <div class="flex flex-col">
+                    <label class="flex items-center justify-between text-gray-700 mb-1">
+                        <span>View 3: </span>
+                        <input type="checkbox" id="toggleView3" class="form-checkbox h-5 w-5 text-blue-600">
+                    </label>
+                    <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
+                </div>
+                <!-- Toggle to minimize version names -->
+                <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
+                    <span>Minimize Version Names</span>
+                    <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">
+                </label>
+            </div>
+            <div class="divider"></div>
+            <button id="shutdownServerBtn" class="w-full h-10 mt-4 bg-red-500 hover:bg-red-600">Close Server</button>
         </div>
-        <div class="divider"></div>
-        <button id="shutdownServerBtn" class="w-full h-10 mt-4 bg-red-500 hover:bg-red-600">Close Server</button>
     </aside>
 
     <script src="script.js"></script>

@@ -11,8 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const leftSidebar = document.getElementById('leftSidebar');
     const rightSidebar = document.getElementById('rightSidebar');
-    const rightMenuBtn = document.getElementById('rightMenuBtn');
-    const rightMenuBtnInHeader = document.getElementById('rightMenuBtnInHeader');
+    // Removed rightMenuBtn and rightMenuBtnInHeader as they are no longer needed for hover functionality
 
     const singleChapterView = document.getElementById('singleChapterView');
     const splitChapterView2 = document.getElementById('splitChapterView2');
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             "PRO": "Proverbs", 
             "ECC": "Ecclesiastes", 
             "SNG": "Song of Songs", 
-            "ISA": "Isaiah", // Corrected SNG
+            "ISA": "Isaiah",
             "JER": "Jeremiah", 
             "LAM": "Lamentations", 
             "EZE": "Ezekiel", 
@@ -426,7 +425,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Sidebar hover logic using JavaScript
+    // Sidebar hover logic using JavaScript for both left and right sidebars
     leftSidebar.addEventListener('mouseenter', () => {
         mainContentWrapper.style.marginLeft = '16rem'; // w-64
     });
@@ -435,11 +434,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         mainContentWrapper.style.marginLeft = '4rem'; // w-16
     });
 
-    const toggleRightSidebar = () => {
-        rightSidebar.classList.toggle('collapsed');
-    };
-    rightMenuBtn.addEventListener('click', toggleRightSidebar);
-    rightMenuBtnInHeader.addEventListener('click', toggleRightSidebar);
+    rightSidebar.addEventListener('mouseenter', () => {
+        mainContentWrapper.style.marginRight = '16rem'; // w-64
+    });
+
+    rightSidebar.addEventListener('mouseleave', () => {
+        mainContentWrapper.style.marginRight = '4rem'; // w-16
+    });
+
+    // Removed toggleRightSidebar and its event listeners
 
     const isSplitViewActive = () => {
         return toggleView2.checked || toggleView3.checked;
@@ -454,9 +457,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (toggleView2.checked || toggleView3.checked) {
             mainContent.classList.remove('flex-col');
             mainContent.classList.add('flex-row');
+            // When in split view, singleChapterView should not be max-width and auto-margin
+            singleChapterView.style.maxWidth = 'none';
+            singleChapterView.style.margin = '0';
         } else {
             mainContent.classList.remove('flex-row');
             mainContent.classList.add('flex-col');
+            // When not in split view, re-apply max-width and auto-margin to singleChapterView
+            singleChapterView.style.maxWidth = '800px'; // Re-apply the max-width
+            singleChapterView.style.margin = '0 auto';  // Re-apply centering
         }
 
         // Ensure singleChapterView is always shown and primary
