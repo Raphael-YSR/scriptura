@@ -7,35 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Define your custom font using @font-face */
-        @font-face {
-            font-family: 'Inter'; /* The name you'll use in your CSS */
-            src: url('/fonts/Inter_18pt-Regular.ttf') format('truetype'); /* Path to your font file and its format */
-            font-weight: 400; /* Regular weight */
-            font-style: normal;
-            font-display: swap; /* Improves loading experience */
-        }
-        /* If you have other weights (e.g., 500, 700), you'd add more @font-face rules, each pointing to its respective .ttf file: */
-        /*
+        /* Define your custom font for Regular weight */
         @font-face {
             font-family: 'Inter';
-            src: url('/fonts/Inter_18pt-Medium.ttf') format('truetype');
-            font-weight: 500;
+            src: url('/fonts/Inter_18pt-Regular.ttf') format('truetype');
+            font-weight: 400; /* Standard weight for Regular */
             font-style: normal;
             font-display: swap;
         }
+
+        /* Define your custom font for Bold weight */
         @font-face {
             font-family: 'Inter';
             src: url('/fonts/Inter_18pt-Bold.ttf') format('truetype');
-            font-weight: 700;
+            font-weight: 700; /* Standard weight for Bold */
             font-style: normal;
             font-display: swap;
         }
-        */
 
         /* Basic styles for verse numbers - kept for functionality */
         .verse-number {
-            font-weight: bold;
+            font-weight: bold; /* This will now use the 700-weight font */
             margin-right: 0.5em;
             vertical-align: super;
             font-size: 0.7em;
@@ -55,7 +47,7 @@
             display: flex;
             min-height: 100vh;
             margin: 0;
-            font-family: 'Inter', sans-serif; /* Now uses your local 'Inter' font */
+            font-family: 'Inter', sans-serif; /* This will automatically pick 400 or 700 based on context */
             background-color: #f9fafb; /* Light background for the main area */
         }
 
