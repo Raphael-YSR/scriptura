@@ -1,29 +1,28 @@
+
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_NKJV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_NKJV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_KJV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_KJV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_NIV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_NIV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_ESV.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_ESV.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_TPT.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_AMPC.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_AMPC.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_AMP.csv' 
 WITH (FORMAT CSV, HEADER true);
 
 COPY verses (translationid, bookid, chapternumber, versenumber, versetext, versetextsearchable, hasfootnotes, wordcount) 
-FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Mark1_AMP.csv' 
+FROM 'D:\Trading Journal\Analysis\A+ BACKTESTING\verses_Ephesians6_TPT.csv' 
 WITH (FORMAT CSV, HEADER true);
-
-

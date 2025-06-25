@@ -5,8 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scriptura</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* Define your custom font using @font-face */
+        @font-face {
+            font-family: 'Inter'; /* The name you'll use in your CSS */
+            src: url('/fonts/Inter_18pt-Regular.ttf') format('truetype'); /* Path to your font file and its format */
+            font-weight: 400; /* Regular weight */
+            font-style: normal;
+            font-display: swap; /* Improves loading experience */
+        }
+        /* If you have other weights (e.g., 500, 700), you'd add more @font-face rules, each pointing to its respective .ttf file: */
+        /*
+        @font-face {
+            font-family: 'Inter';
+            src: url('/fonts/Inter_18pt-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Inter';
+            src: url('/fonts/Inter_18pt-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        */
+
         /* Basic styles for verse numbers - kept for functionality */
         .verse-number {
             font-weight: bold;
@@ -19,12 +45,17 @@
             display: none;
         }
 
+        .textxxl{
+                font-size: 1.5rem;
+                line-height: 2.75rem;
+        }
+
         /* Base layout for body to accommodate two fixed sidebars */
         body {
             display: flex;
             min-height: 100vh;
             margin: 0;
-            font-family: 'Inter', sans-serif; /* Basic font */
+            font-family: 'Inter', sans-serif; /* Now uses your local 'Inter' font */
             background-color: #f9fafb; /* Light background for the main area */
         }
 
@@ -347,10 +378,9 @@
 
     <aside class="left-sidebar" id="leftSidebar">
         <div class="sidebar-content">
-            <h2 class="text-xl font-bold mb-4">Scriptura</h2>
+            <h2 class="textxxl font-bold mb-4">Scriptura</h2>
             <nav id="chapter-nav">
                 <ul id="chapterList" class="space-y-2">
-                    <!-- Chapters will be dynamically loaded here by script.js -->
                     <li>Loading chapters...</li> 
                 </ul>
             </nav>
@@ -359,7 +389,6 @@
 
     <div class="main-content-wrapper" id="mainContentWrapper">
         <header>
-            <!-- Left section: Back button (fixed left) -->
             <div class="header-left">
                 <a href="/" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors duration-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -369,19 +398,14 @@
                 </a>
             </div>
             
-            <!-- Center section: Chapter title (always centered) -->
             <div class="header-center">
                 <h1 id="chapterTitle" class="text-2xl font-bold text-gray-900"></h1>
             </div>
             
-            <!-- Right section: Version selector -->
             <div class="header-right">
-                <label for="versionSelect" class="text-gray-700 font-medium sr-only">Version:</label> <!-- Screen reader only label -->
-                <select id="versionSelect">
-                    <!-- Options will be dynamically populated -->
-                </select>
-                <!-- Removed rightMenuBtnInHeader button -->
-            </div>
+                <label for="versionSelect" class="text-gray-700 font-medium sr-only">Version:</label> <select id="versionSelect">
+                    </select>
+                </div>
         </header>
 
         <main id="mainContent">
@@ -413,7 +437,6 @@
 
     <aside class="right-sidebar" id="rightSidebar">
         <div class="sidebar-content">
-            <!-- Removed rightMenuBtn button -->
             <h3 class="text-gray-800 font-semibold mb-4">Display Options</h3>
             <div class="flex flex-col space-y-3">
                 <label class="flex items-center justify-between text-gray-700">
@@ -430,8 +453,7 @@
             <div id="splitScreenOptions" class="flex flex-col space-y-3">
                 <div class="flex flex-col">
                     <span>Default View: </span>
-                    <label class="text-gray-700 mb-1 sr-only">View 1 ():</label> <!-- Screen reader only label -->
-                    <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
+                    <label class="text-gray-700 mb-1 sr-only">View 1 ():</label> <select id="versionSelectView1" class="versionSelectSplit" data-view="1"></select>
                 </div>
                 
                 <div class="flex flex-col">
@@ -448,7 +470,6 @@
                     </label>
                     <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
                 </div>
-                <!-- Toggle to minimize version names -->
                 <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
                     <span>Minimize Version Names</span>
                     <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">
