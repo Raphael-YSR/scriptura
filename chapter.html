@@ -37,6 +37,23 @@
             display: none;
         }
 
+        /* Style for continuous verses: display inline */
+        .continuous-verses .verse-text-wrapper {
+            display: inline; /* Make verse text flow inline */
+        }
+        .continuous-verses .verse-number {
+            display: inline; /* Keep verse number inline with the text */
+            margin-right: 0.2em; /* Reduce margin for tighter flow */
+        }
+        /* Remove default block display for paragraphs in continuous mode */
+        .continuous-verses p {
+            display: inline;
+        }
+        /* Add a small space after each verse for readability in continuous mode */
+        .continuous-verses p + p::before {
+            content: " ";
+        }
+
         .textxxl{
                 font-size: 1.5rem;
                 line-height: 2.75rem;
@@ -249,7 +266,41 @@
             border-left: 1px solid #e0e0e0; /* Faint left line */
             border-right: 1px solid #e0e0e0; /* Faint right line */
         }
-        
+        /* NEW: Styling for side-by-side verses in chapter-content-block within a split view */
+        .chapter-content-block.side-by-side-verses-active {
+            display: grid; /* Use grid for vertical alignment */
+            grid-template-columns: auto 1fr; /* First column for number, second for text */
+            gap: 0 5px; /* Small gap between number and text */
+        }
+        /* Remove margin-bottom from paragraphs in side-by-side mode */
+        .chapter-content-block.side-by-side-verses-active p {
+            margin-bottom: 0;
+            display: contents; /* Make p content act as if it's directly in grid */
+        }
+
+        .chapter-content-block.side-by-side-verses-active .verse-number {
+            grid-column: 1; /* Force verse number to the first column */
+            text-align: right;
+            padding-right: 5px;
+            /* Adjust original verse-number styling if needed, e.g., remove margin-right */
+            margin-right: 0;
+            font-size: 0.9em; /* Make it slightly larger for grid alignment */
+            vertical-align: baseline; /* Align with text baseline */
+        }
+        .chapter-content-block.side-by-side-verses-active .verse-text-wrapper {
+            grid-column: 2; /* Force verse text to the second column */
+            display: block; /* Ensure text takes up its own block space in grid */
+            margin-bottom: 5px; /* Add spacing between verses */
+        }
+
+
+        /* Ensure .chapter-content and .chapter-content-split are always flex column by default */
+        /* These should be the containers that hold .chapter-content-block */
+        .chapter-content, .chapter-content-split {
+            flex-direction: column;
+            display: flex;
+        }
+
         .chapter-view h3 {
             margin-top: 0;
             padding-bottom: 5px;
@@ -436,8 +487,12 @@
                     <input type="checkbox" id="verseToggle" class="form-checkbox h-5 w-5 text-blue-600" checked>
                 </label>
                 <label class="flex items-center justify-between text-gray-700">
-                    <span>Continuous Reading</span>
-                    <input type="checkbox" id="continuousToggle" class="form-checkbox h-5 w-5 text-blue-600">
+                    <span>Continuous Verses</span>
+                    <input type="checkbox" id="continuousVersesToggle" class="form-checkbox h-5 w-5 text-blue-600">
+                </label>
+                <label class="flex items-center justify-between text-gray-700">
+                    <span>Continuous Chapters</span>
+                    <input type="checkbox" id="continuousChaptersToggle" class="form-checkbox h-5 w-5 text-blue-600">
                 </label>
             </div>
             <div class="divider"></div>
@@ -462,6 +517,10 @@
                     </label>
                     <select id="versionSelectView3" class="versionSelectSplit" data-view="3"></select>
                 </div>
+                <label class="flex items-center justify-between text-gray-700">
+                    <span>Side-by-Side Verses</span>
+                    <input type="checkbox" id="sideBySideVersesToggle" class="form-checkbox h-5 w-5 text-blue-600">
+                </label>
                 <label class="flex items-center justify-between text-gray-700 pt-2 border-t border-gray-200 mt-4">
                     <span>Minimize Version Names</span>
                     <input type="checkbox" id="minimizeVersionNamesToggle" class="form-checkbox h-5 w-5 text-blue-600">
