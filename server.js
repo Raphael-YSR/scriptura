@@ -54,6 +54,7 @@ const translationAbbreviationToIdMap = {
     "AMPC": 5,
     "TPT": 6,
     "ESV": 7,
+    "NLT": 8
 };
 
 // Hardcoded mapping from translation ID to abbreviation (Corrected based on db.md)
@@ -65,6 +66,7 @@ const translationIdToAbbreviationMap = {
     5: "AMPC",
     6: "TPT",
     7: "ESV",
+    8: "NLT"
 };
 
 // Function to get the full book name from its abbreviation (Corrected based on db.md)
